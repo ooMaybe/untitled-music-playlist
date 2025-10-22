@@ -4,10 +4,10 @@
 
 using namespace std;
 
-int ABC = 5;
+int ABCDE = 5;
 
 int main() {
     Test test;
-    cout << test.runCar(ABC) << endl;
+    cout << test.runCar(ABCDE) << endl;
     return 0;
 }

@@ -1,11 +1,13 @@
 #include <iostream>
 #include <cstdio>
+#include "Test.h"
 
 using namespace std;
 
-int
-main(){
+int ABC = 5;
 
-    printf("Hi karam");
+int main() {
+    Test test;
+    cout << test.runCar(ABC) << endl;
     return 0;
 }

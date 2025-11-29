@@ -1,5 +1,7 @@
 #include <iostream>
 #include <iomanip>
+#include <string>
+#include <vector>
 using namespace std;
 
 string finding_song(){
@@ -36,6 +38,35 @@ string finding_cover(){
 
 int main() {
 
+    string userTyped = "b";
+    vector<string> songs;
+
+    for (string song : songs) {
+         if (song.starts_with(finding_song())) {
+         //checks
+    }
+}
+    string library[]= {
+
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+    };
+    struct song{
+        float a;
+        float b;
+        float c;
+        float d;
+        float e;
+        float f;
+
+    };
+
+
+
     string songName = finding_song();
     string artistname = finding_artist();
     string genre = finding_genre();
@@ -46,6 +77,9 @@ int main() {
     cout << "Genre: " << genre << endl;
     cout << "\n" << cover << endl;
 
+
+
     return 0;
     
 }
+

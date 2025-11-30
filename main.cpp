@@ -1,13 +1,29 @@
 #include <iostream>
 #include <cstdio>
-#include "Test.h"
+#include <vector>
+#include <string>
+
+// Project defined libraries
+#include "Backend/Backend.h"
+#include "Backend/FileManager.h"
 
 using namespace std;
 
-int ABCDE = 5;
+Backend backend;
+FileManager fileManager;
 
 int main() {
-    Test test;
-    cout << test.runCar(ABCDE) << endl;
+    handleSetup();
+    handleUI();
+
     return 0;
+}
+
+void handleSetup(){
+    fileManager = new FileManager();
+    backend = new Backend();
+}
+
+void handleUI(){
+
 }

@@ -1,6 +1,12 @@
-# untitled-music-playlist
-<<<<<<< HEAD
-zzzzzzuh
-=======
-Our project!
->>>>>>> 8514d5308c815c5fc97e6d12ba9a87cbb8739b45
+# 🎵 OpenMusic
+A lightweight, free, and opensource music manager created by ENSC 151 Students.
+
+## Features
+- Simple track loading  
+- Clean UI  
+- Fast playback  
+
+## Goals
+- Make music tools accessible  
+- Keep everything open and modular
+- most importantly- FREE

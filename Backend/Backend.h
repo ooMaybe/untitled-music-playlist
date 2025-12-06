@@ -24,12 +24,10 @@ private:
     sqlite3* db;
     
 public:
-    // Constructer, code in here will be executed when the class is created
-    Backend();
-
     // Deconstructer, code in here will be executed when the class is being deleted
     ~Backend();
     
+    void initialize();
     bool openDatabase(const std::string& dbName);
     void closeDatabase();
     bool executeSQL(const std::string& sql);

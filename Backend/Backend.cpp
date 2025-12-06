@@ -4,10 +4,13 @@
 // User libraries
 #include "Backend.h"
 
-Backend::Backend(){
-    // Initializing the database to a null value in case it has anything garbage
+Backend::~Backend(){
+    closeDatabase();
+}
+
+void Backend::initialize(){
     db = nullptr; 
-    bool success = openDatabase("OpenMusic.db");
+    bool success = openDatabase("data/OpenMusic.db");
     if (success){
         std::cout << "[Database] Sucessfully initialized.\n";
     }else{
@@ -15,12 +18,11 @@ Backend::Backend(){
     }
 }
 
-Backend::~Backend(){
-    closeDatabase();
-}
-
 void Backend::closeDatabase(){
-
+    if (db){
+        sqlite3_close(db);
+        db = nullptr;
+    }
 }
 
 bool Backend::openDatabase(const std::string& dbName){
@@ -34,6 +36,19 @@ bool Backend::openDatabase(const std::string& dbName){
     int statusCode = sqlite3_open(dbName.c_str(), &db);
     if (statusCode != SQLITE_OK){
         std::cout << "[WARNING] The database cannot be created! Error message: " << sqlite3_errmsg(db) << "\n";
+        return false;
+    }
+    
+    return true;
+}
+
+bool Backend::executeSQL(const std::string& sql){
+    char errorMessage;
+    int statusCode = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errorMessage);
+    
+    if (statusCode != SQLITE_OK){
+        std::cout << "[WARNING] SQL execution failed! Error message: " << errorMessage << "\n";
+        sqlite3_free(errorMessage);
         return false;
     }
     

@@ -10,6 +10,7 @@
                 "-g",
                 "${workspaceFolder}\\main.cpp",
                 "${workspaceFolder}\\Backend\\Backend.cpp",
+                "${workspaceFolder}\\Backend\\FileManager.cpp",
                 "-x",
                 "c",
                 "${workspaceFolder}\\APIs\\SQLlite\\sqlite3.c",

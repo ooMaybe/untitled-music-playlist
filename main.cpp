@@ -12,6 +12,9 @@ using namespace std;
 Backend backend;
 FileManager fileManager;
 
+void handleSetup();
+void handleUI();
+
 int main() {
     handleSetup();
     handleUI();
@@ -20,8 +23,16 @@ int main() {
 }
 
 void handleSetup(){
-    fileManager = new FileManager();
-    backend = new Backend();
+    cout << "[Main] Starting setup...\n";
+    
+    // Initialize Backend and FileManager instances
+    fileManager = FileManager();
+    fileManager.createFolder("data");
+
+    backend = Backend();
+    backend.initialize();
+
+    cout << "[Main] Setup complete.\n";
 }
 
 void handleUI(){

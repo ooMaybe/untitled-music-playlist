@@ -43,13 +43,12 @@ bool Backend::openDatabase(const std::string& dbName){
 }
 
 bool Backend::executeSQL(const std::string& sql){
-    char errorMessage;
-    int statusCode = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errorMessage);
-    
+    char* errorMessage = nullptr;
+    int statusCode = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errorMessage);    
     if (statusCode != SQLITE_OK){
         std::cout << "[WARNING] SQL execution failed! Error message: " << errorMessage << "\n";
         sqlite3_free(errorMessage);
-        return false;
+        return false;   
     }
     
     return true;

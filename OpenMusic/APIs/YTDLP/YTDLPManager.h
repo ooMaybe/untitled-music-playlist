@@ -1,0 +1,46 @@
+/*****************************
+    Author: Karam Zako
+    Description: API Manager for yt-dlp operations (search and download)
+
+******************************/
+
+#ifndef YTDLPMANAGER_H
+#define YTDLPMANAGER_H
+
+// System Libraries
+#include <string>
+#include <iostream>
+#include <vector>
+
+// Other Libraries
+#include "../Json/json.hpp"  // For JSON parsing
+
+struct SongResult {
+    std::string id;           // Video ID
+    std::string title;        // Song title
+    std::string uploader;     // Artist/Channel name
+    std::string duration;     // Duration in seconds
+    std::string thumbnail;    // Thumbnail URL
+    std::string url;          // Video URL
+};
+
+class YTDLPManager {
+private:
+    std::string ytdlpPath = "..\\APIs\\YTDLP\\yt-dlp.exe";
+    std::string searchResultsFile = "data\\search_results.json";
+    std::string outputFolder = "data\\Downloads\\";
+    
+public:
+    YTDLPManager();
+    
+    // Search for songs on YouTube and return results
+    std::vector<SongResult> searchSongs(const std::string& query, int maxResults = 10);
+    
+    // Download a song by URL to specified output path
+    bool downloadSong(const std::string& url, const std::string& outputPath);
+    
+    // Get song info by URL
+    SongResult getSongInfo(const std::string& url);
+};
+
+#endif

@@ -828,6 +828,11 @@
                <height>81</height>
               </rect>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>41</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Playlist name</string>
              </property>

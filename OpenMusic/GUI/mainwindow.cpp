@@ -4,6 +4,7 @@
 #include "ui_mainwindow.h"
 #include "playlistitemwidget.h"
 #include "playlistlistwidgetyes.h"
+#include "sidebarplaylist.h"
 
 MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), ytdlpManager(manager)
@@ -39,6 +40,10 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
             this, [this](qint64 duration) {
                 updateDuration(static_cast<int>(duration));
             });
+    ui->sidePlaylistList->setResizeMode(QListView::Adjust);
+    ui->sidePlaylistList->setUniformItemSizes(false);
+    ui->sidePlaylistList->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    ui->sidePlaylistList->setStyleSheet("QListWidget::item { padding: 0; margin: 0; }");
 
     // Example: add one song
     addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
@@ -67,6 +72,23 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Pee", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Poop", "23", QPixmap(":/icons/music.png"));
+
+    addSearch("Hello", "David", "3:20", "Augest 13, 2007", QPixmap(":/icons/music.png"));
+    addSearch("Hello", "David", "3:20", "Augest 13, 2007", QPixmap(":/icons/music.png"));
+    addSearch("Hello", "David", "3:20", "Augest 13, 2007", QPixmap(":/icons/music.png"));
+    addSearch("Hello", "David", "3:20", "Augest 13, 2007", QPixmap(":/icons/music.png"));
+    addSearch("Hello", "David", "3:20", "Augest 13, 2007",  QPixmap(":/icons/music.png"));
+    addSearch("Goodbye", "David", "3:20", "Augest 13, 2007", QPixmap(":/icons/music.png"));
+
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Norbu", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Karam", QPixmap(":/icons/music.png"));
 }
 
 MainWindow::~MainWindow()
@@ -95,6 +117,46 @@ void MainWindow::addSearch(const QString &titleName,
     item->setData(0, Qt::UserRole + 1, thumbnail);
 
     ui->searchList->addTopLevelItem(item);
+void MainWindow::addSidePlaylist(const QString &titleName,
+                                 const QPixmap &icon)
+{
+    // 1. Create blank list item
+    auto *item = new QListWidgetItem(ui->sidePlaylistList);
+
+    // 2. Create your custom widget
+    auto *widget = new sideBarPlaylist(ui->sidePlaylistList);
+    widget->setName(titleName);
+    widget->setIcon(icon);
+
+    // 3. Size the row to fit your widget
+    item->setSizeHint(widget->sizeHint());
+
+    // 4. Attach the widget to the item
+    ui->sidePlaylistList->setItemWidget(item, widget);
+}
+
+void MainWindow::addSearch(const QString &titleName,
+                         const QString &titleArtist,
+                         const QString &titleDuration,
+                         const QString &titleDate,
+                         const QPixmap &icon)
+{
+    // 1. Create blank list item
+    auto *item = new QListWidgetItem(ui->searchList);
+
+    // 2. Create your custom widget
+    auto *widget = new PlaylistItemWidget(ui->searchList);
+    widget->setName(titleName);
+    widget->setArtist(titleArtist);
+    widget->setDuration(titleDuration);
+    widget->setDate(titleDate);
+    widget->setIcon(icon);
+
+    // 3. Size the row to fit your widget
+    item->setSizeHint(widget->sizeHint());
+
+    // 4. Attach the widget to the item
+    ui->searchList->setItemWidget(item, widget);
 }
 
 void MainWindow::addSong(const QString &titleName,

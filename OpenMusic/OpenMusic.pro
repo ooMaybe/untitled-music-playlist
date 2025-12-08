@@ -2,7 +2,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++20
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -10,13 +10,25 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    GUI/mainwindow.cpp \
+    GUI/playlistpage.cpp \
+    Backend/Backend.cpp \
+    Backend/FileManager.cpp \
+    APIs/YTDLP/YTDLPManager.cpp \
+    APIs/SQLlite/sqlite3.c
 
 HEADERS += \
-    mainwindow.h
+    GUI/mainwindow.h \
+    GUI/playlistpage.h \
+    Backend/Backend.h \
+    Backend/FileManager.h \
+    APIs/YTDLP/YTDLPManager.h \
+    APIs/SQLlite/sqlite3.h \
+    APIS/Json/json.hpp
 
 FORMS += \
-    mainwindow.ui
+    GUI/mainwindow.ui \
+    GUI/playlistpage.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

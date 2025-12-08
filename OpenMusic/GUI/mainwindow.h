@@ -32,11 +32,16 @@ private slots:
     void on_searchButton_clicked();
 
     void on_searchList_customContextMenuRequested(const QPoint &pos);
+    void on_sideBarPlaylist_customContextMenuRequested(const QPoint &pos);
 
     void on_stopButton_clicked();
 
     void loadThumbnail(const QString &url, QLabel *label);
     void loadThumbnailForTreeItem(const QString &url, QTreeWidgetItem *item);  // ADD THIS
+
+    void on_pushButton_clicked();
+
+    void on_homeButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -61,5 +66,14 @@ private:
                    const QPixmap &icon,
                    const QString &url,
                    const QString &thumbnail);
+
+    void addSidePlaylist(const QString &titleName,
+                    const QPixmap &icon);
+
+    void addToPlaylistPage(const QString &titleName,
+                                       const QString &titleArtist,
+                                       const QString &titleDuration,
+                                       const QString &titleDate,
+                                       const QPixmap &icon);
 };
 #endif // MAINWINDOW_H

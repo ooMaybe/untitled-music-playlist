@@ -1,6 +1,7 @@
 #include <QMessageBox>
 #include <QTimer>
 #include <QFileIconProvider>
+#include <QLabel>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -12,7 +13,6 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Initialize network manager for loading images
     networkManager = new QNetworkAccessManager(this);
 
     // Tree widget for the other one (songsDownload)
@@ -21,16 +21,18 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     ui->songsDownload->setColumnWidth(0, 250);
     ui->songsDownload->setIconSize(QSize(64, 64));
 
-    // Tree WIdget for song results
     ui->searchList->setColumnCount(4);
     ui->searchList->setHeaderLabels(QStringList() << "Title" << "Artist" << "Duration" << "Date");
     ui->searchList->setColumnWidth(0, 250);
     ui->searchList->setIconSize(QSize(64, 64));
 
-    // Context Menu
     ui->searchList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->searchList, &QWidget::customContextMenuRequested,
             this, &MainWindow::on_searchList_customContextMenuRequested);
+
+    ui->sideBarPlaylist->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->sideBarPlaylist, &QWidget::customContextMenuRequested,
+            this, &MainWindow::on_sideBarPlaylist_customContextMenuRequested);
 
     // Connect media player signals to UI updates
     connect(ytdlpManager.getMediaPlayer(), &QMediaPlayer::positionChanged,
@@ -41,6 +43,22 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
             this, [this](qint64 duration) {
                 updateDuration(static_cast<int>(duration));
             });
+    connect(ui->homeButton, &QPushButton::clicked,
+            this, &MainWindow::on_homeButton_clicked);
+
+
+    // Example: add one song
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
+    addSong("Poop", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
 
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
@@ -56,12 +74,56 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Pee", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Poop", "23", QPixmap(":/icons/music.png"));
+
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Norbu", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+    addSidePlaylist("Alex", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+    addSidePlaylist("Karam", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+
+    addToPlaylistPage("Sorry", "Dany", "4:20", "January 6, 2020", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::addToPlaylistPage(const QString &titleName,
+                                   const QString &titleArtist,
+                                   const QString &titleDuration,
+                                   const QString &titleDate,
+                                   const QPixmap &icon)
+{
+    auto *tree = ui->mainPlaylistTree;
+    tree->setColumnCount(5);
+    tree->setHeaderLabels({"Icon", "Name", "Artist", "Duration", "Date Added"});
+    tree->setIconSize(QSize(64, 64));
+    tree->setColumnWidth(0, 80);
+    tree->setUniformRowHeights(false);
+
+    QTreeWidgetItem *item = new QTreeWidgetItem(tree);
+    tree->addTopLevelItem(item);
+
+    auto *iconLabel = new QLabel(tree);
+    iconLabel->setPixmap(icon.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    iconLabel->setAlignment(Qt::AlignCenter);
+    tree->setItemWidget(item, 0, iconLabel);
+
+    item->setText(1, titleName);
+    item->setText(2, titleArtist);
+    item->setText(3, titleDuration);
+    item->setText(4, titleDate);
+
+    tree->setStyleSheet(
+        "QTreeWidget::item { padding-left: 10px; }"
+        );
+}
+
 
 void MainWindow::addSearch(const QString &titleName,
                            const QString &titleArtist,
@@ -88,6 +150,32 @@ void MainWindow::addSearch(const QString &titleName,
     // We try to load thumbnail here please
     loadThumbnailForTreeItem(thumbnail, item);
 }
+}
+void MainWindow::addSidePlaylist(const QString &titleName,
+                                 const QPixmap &icon)
+{
+    auto *tree = ui->sideBarPlaylist;
+    tree->setColumnCount(2);
+    tree->setHeaderLabels({"Icon", "Name"});
+    tree->setIconSize(QSize(64, 64));
+    tree->setColumnWidth(0, 80);
+    tree->setUniformRowHeights(false);
+
+    QTreeWidgetItem *item = new QTreeWidgetItem(tree);
+    tree->addTopLevelItem(item);
+
+    auto *iconLabel = new QLabel(tree);
+    iconLabel->setPixmap(icon.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    iconLabel->setAlignment(Qt::AlignCenter);
+    tree->setItemWidget(item, 0, iconLabel);
+
+    item->setText(1, titleName);
+
+    tree->setStyleSheet(
+        "QTreeWidget::item { padding-left: 10px; }"
+        );
+}
+
 
 void MainWindow::addSong(const QString &titleName,
                          const QString &titleArtist,
@@ -169,6 +257,41 @@ void MainWindow::on_searchButton_clicked()
                   QPixmap(":/icons/music.png"),
                   QString::fromStdString(s.url),
                   QString::fromStdString(s.thumbnail));
+    }
+}
+
+void MainWindow::on_sideBarPlaylist_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidgetItem *item = ui->sideBarPlaylist->itemAt(pos);
+    if (!item) return;
+
+    QMenu menu(this);
+
+    QAction *openAction = menu.addAction("Open");
+    QAction *removeAction = menu.addAction("Remove");
+
+    QAction *chosen = menu.exec(ui->sideBarPlaylist->viewport()->mapToGlobal(pos));
+    if (!chosen) return;
+
+    ui->stackedWidget->setCurrentIndex(1);
+
+    if (chosen == openAction) {
+
+        QWidget *widget = ui->sideBarPlaylist->itemWidget(item, 0);
+        auto *label = qobject_cast<QLabel*>(widget);
+
+        QPixmap pixmap = label->pixmap();
+
+        ui->labelPlaylistImageMain->setPixmap(
+            pixmap.scaled(ui->labelPlaylistImageMain->size(),
+                          Qt::KeepAspectRatio,
+                          Qt::SmoothTransformation)
+            );
+
+        ui->mainPlaylistName->setText(item->text(1));
+
+    } else if (chosen == removeAction) {
+        delete item;
     }
 }
 
@@ -347,3 +470,12 @@ void MainWindow::loadThumbnailForTreeItem(const QString &url, QTreeWidgetItem *i
         reply->deleteLater();
     });
 }
+
+
+
+void MainWindow::on_homeButton_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+    qDebug() << "Hi";
+}
+

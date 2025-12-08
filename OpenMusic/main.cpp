@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     handleSetup();
 
-    MainWindow w(ytdlpManager);
+    MainWindow w(ytdlpManager, backend);
     w.show();
 
     return app.exec();
@@ -86,7 +86,7 @@ void handleSetup() {
     }
 
     std::string ytdlpPath = dir.filePath("APIs/YTDLP/yt-dlp.exe").toStdString();
-    std::string searchResultsFile =dir.filePath("data/search_results.json").toStdString();
+    std::string searchResultsFile = dir.filePath("data/search_results.json").toStdString();
     std::string outputFolder =dir.filePath("data/Downloads/").toStdString();
     std::string databasePath = dir.filePath("data/OpenMusic.db").toStdString();
 

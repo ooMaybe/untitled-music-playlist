@@ -157,6 +157,9 @@
          <property name="text">
           <string>Playlist</string>
          </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
         </widget>
        </widget>
       </widget>
@@ -189,27 +192,62 @@
         <string>Home</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="playlistBox">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>50</y>
-         <width>261</width>
-         <height>51</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="searchButton_2">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>120</y>
-         <width>271</width>
-         <height>41</height>
+         <x>10</x>
+         <y>90</y>
+         <width>191</width>
+         <height>20</height>
         </rect>
        </property>
        <property name="text">
-        <string>Search</string>
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>Playlist Name...</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="createPlaylistButton">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>120</y>
+         <width>241</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Create new Playlist</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>131</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Create a new playlist</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="chooseImageButton">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>90</y>
+         <width>31</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::FolderNew"/>
        </property>
       </widget>
      </widget>
@@ -383,7 +421,10 @@
         </rect>
        </property>
        <property name="text">
-        <string>Playlist</string>
+        <string/>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>
@@ -457,6 +498,9 @@
           </property>
           <property name="text">
            <string>Songs</string>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </widget>

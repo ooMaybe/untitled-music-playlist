@@ -9,6 +9,7 @@
 #include <QTreeWidget>
 
 #include "APIs/YTDLP/YTDLPManager.h"
+#include "Backend/Backend.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -21,7 +22,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(YTDLPManager &manager, QWidget *parent = nullptr);
+    MainWindow(YTDLPManager &manager, Backend &backend, QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -40,12 +41,28 @@ private slots:
     void loadThumbnailForTreeItem(const QString &url, QTreeWidgetItem *item);  // ADD THIS
 
     void on_songsDownload_customContextMenuRequested(const QPoint &pos);
+    void on_mainPlaylistTree_customContextMenuRequested(const QPoint &pos);
     void on_homeButton_clicked();
+
+    void on_chooseImageButton_clicked();
+
+    void on_createPlaylistButton_clicked();
+
+    void loadData();
+
+    void on_forwardTen_clicked();
+    void on_backwardTen_clicked();
+    
+    void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
 
 private:
     Ui::MainWindow *ui;
     YTDLPManager &ytdlpManager;
+    Backend &backend;
     QNetworkAccessManager *networkManager;
+    QString currentPlaylist;  // Track which playlist is currently open
+    bool isPlayingFromFile;   // Track if playing from local file or web URL
+    int currentSongIndex;     // Track current song position in playlist for auto-play
 
     void addSong(const QString &titleName,
                  const QString &titleArtist,

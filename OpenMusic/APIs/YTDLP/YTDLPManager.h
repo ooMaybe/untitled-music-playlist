@@ -50,6 +50,8 @@ public:
     // Get song info by URL
     SongResult getSongInfo(const std::string& url);
 
+    bool convertImageToPng(const std::string& inputFilePath, const std::string& outputFilePath);
+
     // Play a song by URL
     void playSong(const std::string& url);
     void playSong();

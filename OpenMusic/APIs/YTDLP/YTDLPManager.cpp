@@ -191,6 +191,22 @@ void YTDLPManager::stopSong() {
     }
 }
 
-void playSong(){ // add file here later
+bool YTDLPManager::convertImageToPng(const std::string& inputFilePath, const std::string& outputFilePath) {
+    QString qInputPath = QString::fromStdString(inputFilePath);
+    QString qOutputPath = QString::fromStdString(outputFilePath);
 
+    QImage image;
+    if (!image.load(qInputPath)) {
+        qDebug() << "[YTDLPManager] Failed to load image for conversion:" << qInputPath;
+        return false;
+    }
+
+    // Save the loaded image as a PNG file
+    if (!image.save(qOutputPath, "PNG")) {
+        qDebug() << "[YTDLPManager] Failed to save image as PNG:" << qOutputPath;
+        return false;
+    }
+
+    qDebug() << "[YTDLPManager] Image converted successfully to PNG:" << qOutputPath;
+    return true;
 }

@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QMessageBox>
+#include <QRegularExpression>
 
 #include "APIs/Json/json.hpp"
 #include "YTDLPManager.h"
@@ -103,6 +105,51 @@ std::vector<SongResult> YTDLPManager::searchSongs(const std::string& query, int 
     file.close();
 
     return results;
+}
+
+bool YTDLPManager::downloadSong(const std::string& url, const std::string& title){
+    qDebug() << "[YTDLPManager] Downloading song:" << QString::fromStdString(url);
+    QMessageBox::warning(nullptr, "Warning!", QString::fromStdString("Downloading the song: " + title));
+
+    QString ytDlpPath = QDir(QCoreApplication::applicationDirPath()).filePath("APIs/YTDLP/yt-dlp.exe");
+    QString downloadFolder = QDir(QCoreApplication::applicationDirPath()).filePath("data/Downloads");
+    QString ffmpegPath = QDir(QCoreApplication::applicationDirPath()).filePath("APIs/YTDLP/ffmpeg.exe");
+
+    // I NEED THIS BECAUSE IT MAKES SURE NO WEIRD SYMBOLS EXIST... OTHERWISE WINDOWS DIES...
+    QString safeTitle = QString::fromStdString(title);
+    safeTitle.replace(QRegularExpression("[<>:\"/\\\\|?*]"), "");
+
+    QString outputPath = QDir(downloadFolder).filePath(safeTitle + ".%(ext)s");
+    QStringList args;
+    args << "-f" << "bestaudio"
+         << "--extract-audio"
+         << "--audio-format" << "mp3"
+         << "--audio-quality" << "0"
+         << "--ffmpeg-location" << ffmpegPath
+         << "--write-thumbnail"                    // Download thumbnail
+         << "--convert-thumbnails" << "png"        // Convert to PNG
+         << "-o" << outputPath
+         << QString::fromStdString(url);
+
+    QProcess downloadProcess;
+    downloadProcess.setProgram(ytDlpPath);
+    downloadProcess.setArguments(args);
+    downloadProcess.start();
+
+    qDebug() << "[YTDLPManager] Downloading to:" << outputPath;
+
+    if (!downloadProcess.waitForFinished(-1)) {  // Wait indefinitely
+        qDebug() << "[YTDLPManager] Download failed!";
+        return false;
+    }
+
+    if (downloadProcess.exitCode() == 0) {
+        qDebug() << "[YTDLPManager] Download complete!";
+        return true;
+    } else {
+        qDebug() << "[YTDLPManager] Download error:" << downloadProcess.readAllStandardError();
+        return false;
+    }
 }
 
 void YTDLPManager::playSong(const std::string& url) {

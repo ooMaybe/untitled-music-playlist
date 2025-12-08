@@ -1,11 +1,13 @@
 #include <QMessageBox>
+#include <QTimer>
+#include <QFileIconProvider>
+#include <QDir>
 #include <QLabel>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "playlistitemwidget.h"
 #include "playlistlistwidgetyes.h"
-#include "sidebarplaylist.h"
 
 MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), ytdlpManager(manager)
@@ -14,24 +16,26 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
 
     networkManager = new QNetworkAccessManager(this);
 
-    ui->SongHomeList->setStyleSheet("QListWidget::item { border: none; padding: 0; margin: 0; }");
-    ui->SongHomeList->setUniformItemSizes(false);
-    ui->SongHomeList->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->SongHomeList->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->SongHomeList->setFocusPolicy(Qt::NoFocus);
-    ui->SongHomeList->setSpacing(0);
+    // Tree widget for the other one (songsDownload)
+    ui->songsDownload->setColumnCount(4);
+    ui->songsDownload->setHeaderLabels(QStringList() << "Title" << "Artist" << "Duration" << "Date");
+    ui->songsDownload->setColumnWidth(0, 250);
+    ui->songsDownload->setIconSize(QSize(64, 64));
 
+    // Tree WIdget for song results
     ui->searchList->setColumnCount(4);
     ui->searchList->setHeaderLabels(QStringList() << "Title" << "Artist" << "Duration" << "Date");
     ui->searchList->setColumnWidth(0, 250);
+    ui->searchList->setIconSize(QSize(64, 64));
 
     ui->searchList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->searchList, &QWidget::customContextMenuRequested,
             this, &MainWindow::on_searchList_customContextMenuRequested);
 
-    ui->sideBarPlaylist->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->sideBarPlaylist, &QWidget::customContextMenuRequested,
-            this, &MainWindow::on_sideBarPlaylist_customContextMenuRequested);
+    // Context Menu for songsDownload
+    ui->songsDownload->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->songsDownload, &QWidget::customContextMenuRequested,
+            this, &MainWindow::on_songsDownload_customContextMenuRequested);
 
     // Connect media player signals to UI updates
     connect(ytdlpManager.getMediaPlayer(), &QMediaPlayer::positionChanged,
@@ -42,22 +46,6 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
             this, [this](qint64 duration) {
                 updateDuration(static_cast<int>(duration));
             });
-    connect(ui->homeButton, &QPushButton::clicked,
-            this, &MainWindow::on_homeButton_clicked);
-
-
-    // Example: add one song
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
-    addSong("Poop", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
 
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
@@ -73,18 +61,6 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Pee", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Poop", "23", QPixmap(":/icons/music.png"));
-
-    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
-    addSidePlaylist("Norbu", QPixmap(":/icons/music.png"));
-    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
-    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
-    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
-    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
-    addSidePlaylist("Alex", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
-    addSidePlaylist("Alex", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
-    addSidePlaylist("Karam", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
-
-    addToPlaylistPage("Sorry", "Dany", "4:20", "January 6, 2020", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
 }
 
 MainWindow::~MainWindow()
@@ -145,55 +121,30 @@ void MainWindow::addSearch(const QString &titleName,
     item->setData(0, Qt::UserRole + 1, thumbnail);
 
     ui->searchList->addTopLevelItem(item);
+
+    // We try to load thumbnail here please
+    loadThumbnailForTreeItem(thumbnail, item);
 }
-void MainWindow::addSidePlaylist(const QString &titleName,
-                                 const QPixmap &icon)
-{
-    auto *tree = ui->sideBarPlaylist;
-    tree->setColumnCount(2);
-    tree->setHeaderLabels({"Icon", "Name"});
-    tree->setIconSize(QSize(64, 64));
-    tree->setColumnWidth(0, 80);
-    tree->setUniformRowHeights(false);
-
-    QTreeWidgetItem *item = new QTreeWidgetItem(tree);
-    tree->addTopLevelItem(item);
-
-    auto *iconLabel = new QLabel(tree);
-    iconLabel->setPixmap(icon.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    iconLabel->setAlignment(Qt::AlignCenter);
-    tree->setItemWidget(item, 0, iconLabel);
-
-    item->setText(1, titleName);
-
-    tree->setStyleSheet(
-        "QTreeWidget::item { padding-left: 10px; }"
-        );
-}
-
 
 void MainWindow::addSong(const QString &titleName,
                          const QString &titleArtist,
                          const QString &titleDuration,
                          const QString &titleDate,
-                         const QPixmap &icon)
+                         const QPixmap &icon,
+                         const QString &filePath)
 {
-    // 1. Create blank list item
-    auto *item = new QListWidgetItem(ui->SongHomeList);
+    QTreeWidgetItem *item = new QTreeWidgetItem(ui->songsDownload);
 
-    // 2. Create your custom widget
-    auto *widget = new PlaylistItemWidget(ui->SongHomeList);
-    widget->setName(titleName);
-    widget->setArtist(titleArtist);
-    widget->setDuration(titleDuration);
-    widget->setDate(titleDate);
-    widget->setIcon(icon);
+    item->setText(0, titleName);
+    item->setText(1, titleArtist);
+    item->setText(2, titleDuration);
+    item->setText(3, titleDate);
+    item->setIcon(0, QIcon(icon));
 
-    // 3. Size the row to fit your widget
-    item->setSizeHint(widget->sizeHint());
+    // Store file path for playing later
+    item->setData(0, Qt::UserRole, filePath);
 
-    // 4. Attach the widget to the item
-    ui->SongHomeList->setItemWidget(item, widget);
+    ui->songsDownload->addTopLevelItem(item);
 }
 
 void MainWindow::addPlaylist(const QString &titleName,
@@ -316,15 +267,53 @@ void MainWindow::on_searchList_customContextMenuRequested(const QPoint &pos)
         qDebug() << "URL:" << url;
 
         // NOTE: This works but it only plays a "preview". Youtube drops the URL after 30-60 seconds so it might stop working.
-        ytdlpManager.playSong(url.toStdString());  // USE THE URL
+        ytdlpManager.playSong(url.toStdString());
         ui->songNameBox->setText(item->text(0));
 
         // Try to please load thumbnail :D
         loadThumbnail(thumbnail, ui->songImage);
+
+        ui->stopButton->setText("Stop");
     } else if (chosen == downloadAction) {
         qDebug() << "Download:" << item->text(0);
         qDebug() << "URL:" << url;
-        //ytdlpManager.downloadSong(url.toStdString());  // USE THE URL
+
+        bool success = ytdlpManager.downloadSong(url.toStdString(), item->text(0).toStdString());
+
+        if (success) {
+            QMessageBox::information(this, "Success", "Download complete!\n\nSaved to Downloads folder.");
+
+            // Get paths
+            QString exeDir = QCoreApplication::applicationDirPath();
+            QString downloadFolder = QDir(exeDir).filePath("data/Downloads");
+
+            // Sanitize title (same as in YTDLPManager)
+            QString safeTitle = item->text(0);
+            safeTitle.replace(QRegularExpression("[<>:\"/\\\\|?*]"), "");
+
+            QString mp3Path = QDir(downloadFolder).filePath(safeTitle + ".mp3");
+            QString pngPath = QDir(downloadFolder).filePath(safeTitle + ".png");
+
+            // Load thumbnail
+            QPixmap thumbnail;
+            if (QFile::exists(pngPath)) {
+                thumbnail.load(pngPath);
+                thumbnail = thumbnail.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            } else {
+                thumbnail = QPixmap(":/icons/music.png");
+            }
+
+            // Add to songsDownload tree widget
+            addSong(item->text(0),           // Title
+                    item->text(1),           // Artist
+                    item->text(2),           // Duration
+                    QDateTime::currentDateTime().toString("MMM d, yyyy"),  // Date
+                    thumbnail,               // Thumbnail
+                    mp3Path);                // File path
+
+        } else {
+            QMessageBox::critical(this, "Error", "Download failed!");
+        }
     }
 }
 
@@ -381,8 +370,17 @@ void MainWindow::updateDuration(int duration) {
 
 void MainWindow::on_stopButton_clicked()
 {
-    // TODO: Make it pause/play instead of STOP
+    // TODO: Make it pause/play instead of STOP)
     ytdlpManager.stopSong();
+
+    // There are better ways but this is easiest.
+    if (ui->stopButton->text().contains("Play")){
+        ui->stopButton->setText("Stop");
+        ui->stopButton->setIcon(QIcon::fromTheme("media-playback-stop"));
+    }else{
+        ui->stopButton->setText("Play");
+        ui->stopButton->setIcon(QIcon::fromTheme("media-playback-start"));
+    }
 }
 
 void MainWindow::loadThumbnail(const QString &url, QLabel *label) {
@@ -406,12 +404,117 @@ void MainWindow::loadThumbnail(const QString &url, QLabel *label) {
     });
 }
 
+// NOTE: this does NOT support webpg
+void MainWindow::loadThumbnailForTreeItem(const QString &url, QTreeWidgetItem *item) {
+    // Check if URL is valid
+    if (url.isEmpty() || !url.startsWith("http")) {
+        qDebug() << "[MainWindow] Invalid thumbnail URL:" << url;
+        return;
+    }
 
+    QNetworkRequest request(url);
+    // Add user agent to avoid being blocked
+    request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
 
+    QNetworkReply *reply = networkManager->get(request);
 
-void MainWindow::on_homeButton_clicked()
+    // Set timeout (2 seconds)
+    QTimer::singleShot(2000, reply, [reply]() {
+        if (reply->isRunning()) {
+            qDebug() << "[MainWindow] Thumbnail request timed out";
+            reply->abort();
+        }
+    });
+
+    connect(reply, &QNetworkReply::finished, this, [reply, item, url]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray imageData = reply->readAll();
+            QPixmap pixmap;
+            pixmap.loadFromData(imageData);
+
+            if (!pixmap.isNull()) {
+                // Scale to a reasonable size for tree view (e.g., 64x64)
+                QPixmap scaledPixmap = pixmap.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                item->setIcon(0, QIcon(scaledPixmap));
+            } else {
+                qDebug() << "[MainWindow] Failed to decode image from:" << url;
+            }
+        } else {
+            qDebug() << "[MainWindow] Failed to load thumbnail:" << reply->errorString() << "URL:" << url;
+        }
+        reply->deleteLater();
+    });
+}
+
+void MainWindow::on_songsDownload_customContextMenuRequested(const QPoint &pos)
 {
-    ui->stackedWidget->setCurrentIndex(0);
-    qDebug() << "Hi";
+    QTreeWidgetItem *item = ui->songsDownload->itemAt(pos);
+    if (!item) return;
+
+    QMenu menu(this);
+
+    QAction *playAction = menu.addAction(style()->standardIcon(QStyle::SP_MediaPlay), "Play");
+    QAction *deleteAction = menu.addAction(style()->standardIcon(QStyle::SP_TrashIcon), "Delete");
+
+    QAction *chosen = menu.exec(ui->songsDownload->viewport()->mapToGlobal(pos));
+    if (!chosen)
+        return;
+
+    QString filePath = item->data(0, Qt::UserRole).toString();
+
+    if (chosen == playAction) {
+        qDebug() << "[MainWindow] Playing local file:" << filePath;
+
+        if (QFile::exists(filePath)) {
+            // Play from LOCAL FILE (not URL!)
+            ytdlpManager.getMediaPlayer()->setSource(QUrl::fromLocalFile(filePath));
+            ytdlpManager.getMediaPlayer()->play();
+
+            ui->songNameBox->setText(item->text(0));
+
+            // Load thumbnail from local PNG
+            QString pngPath = filePath;
+            pngPath.replace(".mp3", ".png");
+
+            if (QFile::exists(pngPath)) {
+                QPixmap pixmap(pngPath);
+                ui->songImage->setPixmap(pixmap.scaled(ui->songImage->size(),
+                                                       Qt::KeepAspectRatio,
+                                                       Qt::SmoothTransformation));
+            } else {
+                ui->songImage->setPixmap(QPixmap(":/icons/music.png"));
+            }
+
+            ui->stopButton->setText("Stop");
+        } else {
+            QMessageBox::warning(this, "Error", "File not found!\n\n" + filePath);
+        }
+
+    } else if (chosen == deleteAction) {
+        auto reply = QMessageBox::question(this, "Delete Song",
+                                           "Are you sure you want to delete:\n" + item->text(0),
+                                           QMessageBox::Yes | QMessageBox::No);
+
+        if (reply == QMessageBox::Yes) {
+            ytdlpManager.getMediaPlayer()->setSource(QUrl());
+
+            // Delete MP3 file
+            if (QFile::exists(filePath)) {
+                QFile::remove(filePath);
+            }
+
+            // Delete PNG thumbnail
+            QString pngPath = filePath;
+            pngPath.replace(".mp3", ".png");
+            if (QFile::exists(pngPath)) {
+                QFile::remove(pngPath);
+            }
+
+            // Remove from tree
+            delete item;
+
+            qDebug() << "[MainWindow] Deleted:" << filePath;
+        }
+    }
 }
 

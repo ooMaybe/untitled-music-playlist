@@ -32,6 +32,10 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     connect(ui->searchList, &QWidget::customContextMenuRequested,
             this, &MainWindow::on_searchList_customContextMenuRequested);
 
+    ui->sideBarPlaylist->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->sideBarPlaylist, &QWidget::customContextMenuRequested,
+            this, &MainWindow::on_sideBarPlaylist_customContextMenuRequested);
+
     // Context Menu for songsDownload
     ui->songsDownload->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->songsDownload, &QWidget::customContextMenuRequested,
@@ -47,25 +51,47 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
                 updateDuration(static_cast<int>(duration));
             });
 
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Pee", "23", QPixmap(":/icons/music.png"));
-    addPlaylist("Poop", "23", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Norbu", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+    addSidePlaylist("Alex", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+    addSidePlaylist("Karam", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+
+    addToPlaylistPage("Sorry", "Dany", "4:20", "January 6, 2020", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::addSidePlaylist(const QString &titleName,
+                                 const QPixmap &icon)
+{
+    auto *tree = ui->sideBarPlaylist;
+    tree->setColumnCount(2);
+    tree->setHeaderLabels({"Icon", "Name"});
+    tree->setIconSize(QSize(64, 64));
+    tree->setColumnWidth(0, 80);
+    tree->setUniformRowHeights(false);
+
+    QTreeWidgetItem *item = new QTreeWidgetItem(tree);
+    tree->addTopLevelItem(item);
+
+    auto *iconLabel = new QLabel(tree);
+    iconLabel->setPixmap(icon.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    iconLabel->setAlignment(Qt::AlignCenter);
+    tree->setItemWidget(item, 0, iconLabel);
+
+    item->setText(1, titleName);
+
+    tree->setStyleSheet(
+        "QTreeWidget::item { padding-left: 10px; }"
+        );
 }
 
 void MainWindow::addToPlaylistPage(const QString &titleName,
@@ -147,25 +173,6 @@ void MainWindow::addSong(const QString &titleName,
     ui->songsDownload->addTopLevelItem(item);
 }
 
-void MainWindow::addPlaylist(const QString &titleName,
-                             const QString &titleNumSong,
-                             const QPixmap &icon)
-{
-    // 1. Create blank list item
-    auto *item = new QListWidgetItem(ui->PlaylistHomeList);
-
-    // 2. Create your custom widget
-    auto *widget = new PlaylistListWidgetYes(ui->PlaylistHomeList);
-    widget->setNamePlaylist(titleName);
-    widget->setNumSong(titleNumSong);
-    widget->setIconPlaylist(icon);
-
-    // 3. Size the row to fit your widget
-    item->setSizeHint(widget->sizeHint());
-
-    // 4. Attach the widget to the item
-    ui->PlaylistHomeList->setItemWidget(item, widget);
-}
 
 
 void MainWindow::on_searchButton_clicked()

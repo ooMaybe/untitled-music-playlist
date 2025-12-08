@@ -71,5 +71,8 @@ private:
                                        const QString &titleDuration,
                                        const QString &titleDate,
                            const QPixmap &icon);
+
+    void addSidePlaylist(const QString &titleName,
+                                     const QPixmap &icon);
 };
 #endif // MAINWINDOW_H

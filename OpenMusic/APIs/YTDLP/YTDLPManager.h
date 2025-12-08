@@ -11,6 +11,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 struct SongResult {
     std::string id;           // Video ID
@@ -27,8 +29,12 @@ private:
     std::string searchResultsFile = "data\\search_results.json";
     std::string outputFolder = "data\\Downloads\\";
 
+    QMediaPlayer* mediaPlayer;
+    QAudioOutput* audioOutput;
+
 public:
     YTDLPManager();
+    ~YTDLPManager();
 
     // Updates the paths
     void setPaths(const std::string& ytdlp,
@@ -43,6 +49,14 @@ public:
     
     // Get song info by URL
     SongResult getSongInfo(const std::string& url);
+
+    // Play a song by URL
+    void playSong(const std::string& url);
+    void playSong();
+    void stopSong();
+
+    QMediaPlayer* getMediaPlayer() { return mediaPlayer; }
+
 };
 
 #endif

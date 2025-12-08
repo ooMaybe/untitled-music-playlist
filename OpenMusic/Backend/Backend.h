@@ -10,6 +10,7 @@
 #define BACKEND_H
 
 #include <string>
+#include <iostream>
 
 // Since the SQLLite library is a C library, we have to port it into C++
 // This is done using the "extern" keyword and then importing the C library
@@ -27,7 +28,7 @@ public:
     // Deconstructer, code in here will be executed when the class is being deleted
     ~Backend();
     
-    void initialize();
+    void initialize(std::string &dbPath);
     bool openDatabase(const std::string& dbName);
     void closeDatabase();
     bool executeSQL(const std::string& sql);

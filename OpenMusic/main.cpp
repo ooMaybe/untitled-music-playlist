@@ -1,5 +1,7 @@
 #include <iostream>
+#include <filesystem>
 #include <QApplication>
+#include <QDir>
 
 // Project defined libraries
 #include "GUI/mainwindow.h"
@@ -8,6 +10,7 @@
 #include "APIs/YTDLP/YTDLPManager.h"
 
 using namespace std;
+namespace fs = std::filesystem;
 
 Backend backend;
 FileManager fileManager;
@@ -17,51 +20,62 @@ void handleSetup();
 int handleUI(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
     handleSetup();
-    int exitCode = handleUI(argc, argv);
 
-    cout << "Please enter a song to search: ";
-    string songName;
-    getline(cin, songName);
+    MainWindow w(ytdlpManager);
+    w.show();
 
-    // Search for the song
-    vector<SongResult> results = ytdlpManager.searchSongs(songName, 10);
+    return app.exec();
+}
 
-    // Display results
-    if (results.empty()) {
-        cout << "No results found.\n";
-    } else {
-        cout << "\nSearch Results:\n";
-        cout << "===============================================\n";
+void handleSetup() {
+    std::cout << "[Main] Starting setup...\n";
 
-        for (size_t i = 0; i < results.size(); i++) {
-            cout << (i + 1) << ". " << results[i].title << "\n";
-            cout << "   Artist: " << results[i].uploader << "\n";
-            cout << "   Duration: " << results[i].duration << " seconds\n";
-            cout << "   URL: " << results[i].url << "\n";
-            cout << "-----------------------------------------------\n";
+    // Base dir = folder of the exe (inside build dir)
+    QDir dir(QCoreApplication::applicationDirPath());
+
+    fileManager = FileManager();
+    fileManager.createFolder(dir.filePath("data").toStdString());
+    fileManager.createFolder(dir.filePath("data/Downloads").toStdString());
+
+    // Navigate to project root using QDir
+    QDir projectRoot = dir;
+    projectRoot.cdUp();  // debug
+    projectRoot.cdUp();  // Desktop_Qt_6_9_2_MinGW_64_bit-Debug
+    projectRoot.cdUp();  // build
+    // Now we're at OpenMusic folder
+
+    QString sourceFilePath = projectRoot.filePath("APIs/YTDLP/yt-dlp.exe");
+    QString targetDirPath = dir.filePath("APIs/YTDLP");
+    QString targetFilePath = dir.filePath("APIs/YTDLP/yt-dlp.exe");
+
+    // Create target directory
+    QDir().mkpath(targetDirPath);
+
+    if (!QFile::exists(targetFilePath)) {
+        if (QFile::exists(sourceFilePath)) {
+            if (QFile::copy(sourceFilePath, targetFilePath)) {
+                std::cout << "[Setup] Copied yt-dlp.exe to runtime API folder.\n";
+            } else {
+                std::cerr << "[Setup] Failed to copy yt-dlp.exe!\n";
+            }
+        } else {
+            std::cerr << "[Setup] Source yt-dlp.exe not found!\n";
         }
+    } else {
+        std::cout << "[Setup] yt-dlp.exe already exists at target.\n";
     }
 
-    return exitCode;
-}
+    std::string ytdlpPath =dir.filePath("APIs/YTDLP/yt-dlp.exe").toStdString();
+    std::string searchResultsFile =dir.filePath("data/search_results.json").toStdString();
+    std::string outputFolder =dir.filePath("data/Downloads/").toStdString();
+    std::string databasePath = dir.filePath("data/OpenMusic.db").toStdString();
 
-void handleSetup(){
-    cout << "[Main] Starting setup...\n";
-    
-    // Initialize Backend and FileManager instances
-    fileManager = FileManager();
-    fileManager.createFolder("data");
+    ytdlpManager.setPaths(ytdlpPath, searchResultsFile, outputFolder);
 
     backend = Backend();
-    backend.initialize();
+    backend.initialize(databasePath);
 
-    cout << "[Main] Setup complete.\n";
-}
-
-int handleUI(int argc, char *argv[]){
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-    return a.exec();
+    std::cout << "[Main] Setup complete.\n";
 }

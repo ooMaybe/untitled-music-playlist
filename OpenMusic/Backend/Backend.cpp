@@ -1,6 +1,3 @@
-// System Libraries
-#include <iostream>
-
 // User libraries
 #include "Backend.h"
 
@@ -8,8 +5,8 @@ Backend::~Backend(){
     closeDatabase();
 }
 
-void Backend::initialize(){
-    db = nullptr; 
+void Backend::initialize(std::string &dbPath){
+    db = nullptr;
     bool success = openDatabase("data/OpenMusic.db");
     if (success){
         std::cout << "[Database] Sucessfully initialized.\n";

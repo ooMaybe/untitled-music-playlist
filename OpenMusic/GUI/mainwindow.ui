@@ -144,7 +144,18 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="QListWidget" name="sidePlaylistList"/>
+          <widget class="QTreeWidget" name="sideBarPlaylist">
+           <column>
+            <property name="text">
+             <string>Icon</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Name</string>
+            </property>
+           </column>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -236,7 +247,7 @@
       <property name="frameShadow">
        <enum>QFrame::Shadow::Raised</enum>
       </property>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="homeButton">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -455,7 +466,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_3">
       <widget class="QFrame" name="maining">
@@ -574,34 +585,6 @@
              </property>
              <property name="placeholderText">
               <string>Search for a song...</string>
-             </property>
-            </widget>
-            <widget class="QWidget" name="gridLayoutWidget_3">
-             <property name="geometry">
-              <rect>
-               <x>400</x>
-               <y>10</y>
-               <width>591</width>
-               <height>171</height>
-              </rect>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_3">
-              <item row="0" column="0">
-               <widget class="QListWidget" name="searchList"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QPushButton" name="pushButton_5">
-             <property name="geometry">
-              <rect>
-               <x>70</x>
-               <y>90</y>
-               <width>211</width>
-               <height>51</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Search</string>
              </property>
             </widget>
            </widget>
@@ -822,8 +805,21 @@
              <property name="frameShadow">
               <enum>QFrame::Shadow::Raised</enum>
              </property>
+             <widget class="QLabel" name="labelPlaylistImageMain">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>261</width>
+                <height>231</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
             </widget>
-            <widget class="QLineEdit" name="lineEdit_14">
+            <widget class="QLineEdit" name="mainPlaylistName">
              <property name="geometry">
               <rect>
                <x>320</x>
@@ -839,8 +835,8 @@
             <widget class="QLineEdit" name="lineEdit_15">
              <property name="geometry">
               <rect>
-               <x>330</x>
-               <y>230</y>
+               <x>320</x>
+               <y>160</y>
                <width>191</width>
                <height>24</height>
               </rect>
@@ -859,6 +855,47 @@
             <property name="frameShadow">
              <enum>QFrame::Shadow::Raised</enum>
             </property>
+            <widget class="QWidget" name="verticalLayoutWidget_2">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>1001</width>
+               <height>301</height>
+              </rect>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QTreeWidget" name="mainPlaylistTree">
+                <column>
+                 <property name="text">
+                  <string>Icon</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Name</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Artist</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Duration</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Date Added</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
          </layout>

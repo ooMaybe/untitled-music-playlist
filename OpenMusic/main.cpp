@@ -39,33 +39,43 @@ void handleSetup() {
     fileManager.createFolder(dir.filePath("data").toStdString());
     fileManager.createFolder(dir.filePath("data/Downloads").toStdString());
 
-    // ensures yt-dlp.exe is copied to apis folder
-    fs::path targetDir = dir.filePath("APIs/YTDLP").toStdString();
-    fs::create_directories(targetDir);  // make sure folder exists
+    // Navigate to project root using QDir
+    QDir projectRoot = dir;
+    projectRoot.cdUp();  // debug
+    projectRoot.cdUp();  // Desktop_Qt_6_9_2_MinGW_64_bit-Debug
+    projectRoot.cdUp();  // build
+    // Now we're at OpenMusic folder
 
-    fs::path targetFile = targetDir / "yt-dlp.exe";
-    fs::path sourceFile = fs::path("../../../APIs/YTDLP/yt-dlp.exe"); // adjust relative to your project
+    QString sourceFilePath = projectRoot.filePath("APIs/YTDLP/yt-dlp.exe");
+    QString targetDirPath = dir.filePath("APIs/YTDLP");
+    QString targetFilePath = dir.filePath("APIs/YTDLP/yt-dlp.exe");
 
-    if (!fs::exists(targetFile)) {
-        if (fs::exists(sourceFile)) {
-            fs::copy_file(sourceFile, targetFile, fs::copy_options::overwrite_existing);
-            std::cout << "[Setup] Copied yt-dlp.exe to runtime API folder.\n";
+    // Create target directory
+    QDir().mkpath(targetDirPath);
+
+    if (!QFile::exists(targetFilePath)) {
+        if (QFile::exists(sourceFilePath)) {
+            if (QFile::copy(sourceFilePath, targetFilePath)) {
+                std::cout << "[Setup] Copied yt-dlp.exe to runtime API folder.\n";
+            } else {
+                std::cerr << "[Setup] Failed to copy yt-dlp.exe!\n";
+            }
         } else {
             std::cerr << "[Setup] Source yt-dlp.exe not found!\n";
         }
+    } else {
+        std::cout << "[Setup] yt-dlp.exe already exists at target.\n";
     }
 
-    std::string ytdlpPath =
-        dir.filePath("APIs/YTDLP/yt-dlp.exe").toStdString();
-    std::string searchResultsFile =
-        dir.filePath("data/search_results.json").toStdString();
-    std::string outputFolder =
-        dir.filePath("data/Downloads/").toStdString();
+    std::string ytdlpPath =dir.filePath("APIs/YTDLP/yt-dlp.exe").toStdString();
+    std::string searchResultsFile =dir.filePath("data/search_results.json").toStdString();
+    std::string outputFolder =dir.filePath("data/Downloads/").toStdString();
+    std::string databasePath = dir.filePath("data/OpenMusic.db").toStdString();
 
     ytdlpManager.setPaths(ytdlpPath, searchResultsFile, outputFolder);
 
     backend = Backend();
-    backend.initialize();
+    backend.initialize(databasePath);
 
     std::cout << "[Main] Setup complete.\n";
 }

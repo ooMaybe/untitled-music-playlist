@@ -335,7 +335,7 @@
      <property name="frameShadow">
       <enum>QFrame::Shadow::Raised</enum>
      </property>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="stopButton">
       <property name="geometry">
        <rect>
         <x>560</x>
@@ -345,10 +345,13 @@
        </rect>
       </property>
       <property name="text">
-       <string>PushButton</string>
+       <string>Play</string>
+      </property>
+      <property name="icon">
+       <iconset theme="QIcon::ThemeIcon::MediaPlaybackStart"/>
       </property>
      </widget>
-     <widget class="QProgressBar" name="progressBar">
+     <widget class="QProgressBar" name="songProgress">
       <property name="geometry">
        <rect>
         <x>340</x>
@@ -360,8 +363,11 @@
       <property name="value">
        <number>24</number>
       </property>
+      <property name="textVisible">
+       <bool>false</bool>
+      </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_3">
+     <widget class="QPushButton" name="forwardTen">
       <property name="geometry">
        <rect>
         <x>650</x>
@@ -371,10 +377,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>PushButton</string>
+       <string>+10</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_4">
+     <widget class="QPushButton" name="backwardTen">
       <property name="geometry">
        <rect>
         <x>500</x>
@@ -384,10 +390,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>PushButton</string>
+       <string>-10</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_8">
+     <widget class="QLineEdit" name="startingBox">
       <property name="geometry">
        <rect>
         <x>280</x>
@@ -396,8 +402,11 @@
         <height>24</height>
        </rect>
       </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_9">
+     <widget class="QLineEdit" name="durationBox">
       <property name="geometry">
        <rect>
         <x>870</x>
@@ -405,6 +414,9 @@
         <width>41</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QFrame" name="frame_14">
@@ -422,7 +434,7 @@
       <property name="frameShadow">
        <enum>QFrame::Shadow::Raised</enum>
       </property>
-      <widget class="QFrame" name="frame_15">
+      <widget class="QFrame" name="frameImage">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -437,8 +449,21 @@
        <property name="frameShadow">
         <enum>QFrame::Shadow::Raised</enum>
        </property>
+       <widget class="QLabel" name="songImage">
+        <property name="geometry">
+         <rect>
+          <x>8</x>
+          <y>5</y>
+          <width>91</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_12">
+      <widget class="QLineEdit" name="songNameBox">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -451,7 +476,7 @@
         <string>Song</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_13">
+      <widget class="QLineEdit" name="playlistBoxName">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -524,23 +549,13 @@
             <property name="frameShadow">
              <enum>QFrame::Shadow::Raised</enum>
             </property>
-            <widget class="QLineEdit" name="searchBar">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>10</y>
-               <width>371</width>
-               <height>51</height>
-              </rect>
-             </property>
-            </widget>
             <widget class="QWidget" name="gridLayoutWidget_3">
              <property name="geometry">
               <rect>
-               <x>400</x>
-               <y>10</y>
-               <width>591</width>
-               <height>171</height>
+               <x>10</x>
+               <y>60</y>
+               <width>981</width>
+               <height>131</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
@@ -576,14 +591,35 @@
             <widget class="QPushButton" name="searchButton">
              <property name="geometry">
               <rect>
-               <x>70</x>
-               <y>90</y>
-               <width>211</width>
-               <height>51</height>
+               <x>710</x>
+               <y>10</y>
+               <width>271</width>
+               <height>41</height>
               </rect>
              </property>
              <property name="text">
               <string>Search</string>
+             </property>
+            </widget>
+            <widget class="QLineEdit" name="searchBar">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>13</y>
+               <width>681</width>
+               <height>41</height>
+              </rect>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>16</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>Search for a song...</string>
              </property>
             </widget>
            </widget>

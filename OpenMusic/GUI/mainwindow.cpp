@@ -1,3 +1,5 @@
+#include <QMessageBox>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "playlistitemwidget.h"
@@ -7,6 +9,10 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), ytdlpManager(manager)
 {
     ui->setupUi(this);
+
+    // Initialize network manager for loading images
+    networkManager = new QNetworkAccessManager(this);
+
     ui->SongHomeList->setStyleSheet("QListWidget::item { border: none; padding: 0; margin: 0; }");
     ui->SongHomeList->setUniformItemSizes(false);
     ui->SongHomeList->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -23,6 +29,16 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     ui->searchList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->searchList, &QWidget::customContextMenuRequested,
             this, &MainWindow::on_searchList_customContextMenuRequested);
+
+    // Connect media player signals to UI updates
+    connect(ytdlpManager.getMediaPlayer(), &QMediaPlayer::positionChanged,
+            this, [this](qint64 position) {
+                updateProgress(static_cast<int>(position));
+            });
+    connect(ytdlpManager.getMediaPlayer(), &QMediaPlayer::durationChanged,
+            this, [this](qint64 duration) {
+                updateDuration(static_cast<int>(duration));
+            });
 
     // Example: add one song
     addSong("Nightcall", "Kavinsky", "3:32", "Augest 3, 2025", QPixmap(":/icons/music.png"));
@@ -57,11 +73,14 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 void MainWindow::addSearch(const QString &titleName,
-                         const QString &titleArtist,
-                         const QString &titleDuration,
-                         const QString &titleDate,
-                         const QPixmap &icon)
+                           const QString &titleArtist,
+                           const QString &titleDuration,
+                           const QString &titleDate,
+                           const QPixmap &icon,
+                           const QString &url,
+                           const QString &thumbnail)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(ui->searchList);
 
@@ -69,11 +88,12 @@ void MainWindow::addSearch(const QString &titleName,
     item->setText(1, titleArtist);
     item->setText(2, titleDuration);
     item->setText(3, titleDate);
-
-    // Set icon in the first column
     item->setIcon(0, icon);
 
-    // Add top-level item to the tree
+    // Store URL and thumbnail
+    item->setData(0, Qt::UserRole, url);
+    item->setData(0, Qt::UserRole + 1, thumbnail);
+
     ui->searchList->addTopLevelItem(item);
 }
 
@@ -125,13 +145,17 @@ void MainWindow::addPlaylist(const QString &titleName,
 void MainWindow::on_searchButton_clicked()
 {
     std::string query = ui->searchBar->text().toStdString();
+    if (query.length() == 0){
+        QMessageBox::critical(this, "Error", "You must typed something into the search bar before searching!");
+        return;
+    }
+
     std::vector<SongResult> songs = ytdlpManager.searchSongs(query, 10);
 
     ui->searchList->clear();
     ui->searchBar->clear();
 
     for (const auto& s : songs) {
-        std::cout << "TEST:" << s.duration;
         int durationSec = 0;
 
         // Check if the duration string is valid before converting
@@ -153,24 +177,121 @@ void MainWindow::on_searchButton_clicked()
                   QString::fromStdString(s.uploader),
                   durationStr,
                   "Unknown date",
-                  QPixmap(":/icons/music.png"));
+                  QPixmap(":/icons/music.png"),
+                  QString::fromStdString(s.url),
+                  QString::fromStdString(s.thumbnail));
     }
 }
 
 void MainWindow::on_searchList_customContextMenuRequested(const QPoint &pos)
 {
-    // Get the item at the clicked position
     QTreeWidgetItem *item = ui->searchList->itemAt(pos);
     if (!item) return;
 
     QMenu menu(this);
-    menu.addAction("Play", [item]() {
-        qDebug() << "Play:" << item->text(0);
-    });
-    menu.addAction("Download", [item]() {
-        qDebug() << "Download:" << item->text(0);
-    });
 
-    menu.exec(ui->searchList->viewport()->mapToGlobal(pos));
+    QAction *playAction = menu.addAction(style()->standardIcon(QStyle::SP_MediaPlay), "Play");
+    QAction *downloadAction = menu.addAction(style()->standardIcon(QStyle::SP_ArrowDown), "Download");
+
+    QAction *chosen = menu.exec(ui->searchList->viewport()->mapToGlobal(pos));
+    if (!chosen)
+        return;
+
+    // Retrieve the stored URL
+    QString url = item->data(0, Qt::UserRole).toString();
+    QString thumbnail = item->data(0, Qt::UserRole + 1).toString();
+
+    if (chosen == playAction) {
+        qDebug() << "Play:" << item->text(0);
+        qDebug() << "URL:" << url;
+
+        // NOTE: This works but it only plays a "preview". Youtube drops the URL after 30-60 seconds so it might stop working.
+        ytdlpManager.playSong(url.toStdString());  // USE THE URL
+        ui->songNameBox->setText(item->text(0));
+
+        // Try to please load thumbnail :D
+        loadThumbnail(thumbnail, ui->songImage);
+    } else if (chosen == downloadAction) {
+        qDebug() << "Download:" << item->text(0);
+        qDebug() << "URL:" << url;
+        //ytdlpManager.downloadSong(url.toStdString());  // USE THE URL
+    }
 }
 
+void MainWindow::updateProgress(int position) {
+    // Update progress bar
+    if (ui->songProgress->maximum() > 0) {
+        ui->songProgress->setValue(position);
+    }
+
+    // Update starting time (current position)
+    int seconds = (position / 1000) % 60;
+    int minutes = (position / 1000 / 60) % 60;
+    int hours = (position / 1000 / 60 / 60);
+
+    QString timeStr;
+    if (hours > 0) {
+        timeStr = QString("%1:%2:%3")
+        .arg(hours)
+            .arg(minutes, 2, 10, QChar('0'))
+            .arg(seconds, 2, 10, QChar('0'));
+    } else {
+        timeStr = QString("%1:%2")
+        .arg(minutes)
+            .arg(seconds, 2, 10, QChar('0'));
+    }
+
+    ui->startingBox->setText(timeStr);
+}
+
+void MainWindow::updateDuration(int duration) {
+    // Set progress bar range
+    ui->songProgress->setRange(0, duration);
+
+    // Update duration time (total length)
+    int seconds = (duration / 1000) % 60;
+    int minutes = (duration / 1000 / 60) % 60;
+    int hours = (duration / 1000 / 60 / 60);
+
+    QString timeStr;
+    if (hours > 0) {
+        timeStr = QString("%1:%2:%3")
+        .arg(hours)
+            .arg(minutes, 2, 10, QChar('0'))
+            .arg(seconds, 2, 10, QChar('0'));
+    } else {
+        timeStr = QString("%1:%2")
+        .arg(minutes)
+            .arg(seconds, 2, 10, QChar('0'));
+    }
+
+    // Percentage displayed.
+    ui->durationBox->setText(timeStr);
+}
+
+void MainWindow::on_stopButton_clicked()
+{
+    // TODO: Make it pause/play instead of STOP
+    ytdlpManager.stopSong();
+}
+
+void MainWindow::loadThumbnail(const QString &url, QLabel *label) {
+    QNetworkRequest request(url);
+    QNetworkReply *reply = networkManager->get(request);
+
+    connect(reply, &QNetworkReply::finished, this, [reply, label]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray imageData = reply->readAll();
+            QPixmap pixmap;
+            pixmap.loadFromData(imageData);
+
+            if (!pixmap.isNull()) {
+                label->setPixmap(pixmap.scaled(label->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            }
+        } else {
+            qDebug() << "[MainWindow] Failed to load thumbnail:" << reply->errorString();
+            label->setPixmap(QPixmap(":/icons/music.png"));  // Fallback
+        }
+        reply->deleteLater();
+    });
+}

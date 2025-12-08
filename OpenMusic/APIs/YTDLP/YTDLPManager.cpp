@@ -6,6 +6,8 @@
 #include <QProcess>
 #include <QFile>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include "APIs/Json/json.hpp"
 #include "YTDLPManager.h"
@@ -17,7 +19,16 @@ YTDLPManager::YTDLPManager()
     : ytdlpPath("yt-dlp.exe"),      // temporary default
     searchResultsFile("search_results.json"),
     outputFolder("Downloads/")
-{}
+{
+    mediaPlayer = new QMediaPlayer();
+    audioOutput = new QAudioOutput();
+    mediaPlayer->setAudioOutput(audioOutput);
+}
+
+YTDLPManager::~YTDLPManager() {
+    delete mediaPlayer;
+    delete audioOutput;
+}
 
 void YTDLPManager::setPaths(const std::string& ytdlp,
                             const std::string& searchFile,
@@ -35,13 +46,12 @@ std::vector<SongResult> YTDLPManager::searchSongs(const std::string& query, int 
     QString ytDlpPath = QDir(exeDir).filePath("APIs/YTDLP/yt-dlp.exe");
     QString searchResultsFile = QDir(exeDir).filePath("data/search_results.json");
 
-    // Prepare QProcess
     QProcess process;
     QStringList args;
-    args << "--no-playlist"          // fetch full metadata
+    args << "--no-playlist"
          << "--no-warnings"
          << "--skip-download"
-         << "--dump-single-json"
+         << "-j"  // Output one JSON object per line
          << QString("ytsearch%1:%2").arg(limit).arg(QString::fromStdString(query));
 
     process.setProgram(ytDlpPath);
@@ -57,31 +67,28 @@ std::vector<SongResult> YTDLPManager::searchSongs(const std::string& query, int 
         return results;
     }
 
-    // Read JSON output
     QFile file(searchResultsFile);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "[YTDLPManager] Failed to open JSON file:" << searchResultsFile;
         return results;
     }
 
-    QByteArray jsonData = file.readAll();
-    file.close();
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        if (line.isEmpty()) continue;
 
-    if (jsonData.isEmpty()) {
-        qDebug() << "[YTDLPManager] yt-dlp returned empty JSON!";
-        return results;
-    }
+        try {
+            json item = json::parse(line.toStdString());
 
-    // Parse JSON
-    try {
-        json data = json::parse(jsonData.constData());
-        for (auto& item : data["entries"]) {
             SongResult s;
-            s.title    = item.value("title", "Unknown");
+            s.id = item.value("id", "");
+            s.title = item.value("title", "Unknown");
             s.uploader = item.value("uploader", "Unknown");
-            s.url      = item.value("webpage_url", "");
+            s.url = item.value("webpage_url", "");
+            s.thumbnail = item.value("thumbnail", "");
 
-            // Get duration in seconds, default 0
+            // Get duration in seconds
             if (item.contains("duration") && item["duration"].is_number()) {
                 s.duration = std::to_string(item["duration"].get<int>());
             } else {
@@ -89,10 +96,54 @@ std::vector<SongResult> YTDLPManager::searchSongs(const std::string& query, int 
             }
 
             results.push_back(s);
+        } catch (json::parse_error& e) {
+            qDebug() << "[YTDLPManager] Failed to parse JSON line:" << e.what();
         }
-    } catch (json::parse_error& e) {
-        qDebug() << "[YTDLPManager] Failed to parse JSON:" << e.what();
     }
+    file.close();
 
     return results;
+}
+
+void YTDLPManager::playSong(const std::string& url) {
+    qDebug() << "[YTDLPManager] Playing song:" << QString::fromStdString(url);
+
+    QString exeDir = QCoreApplication::applicationDirPath();
+    QString ytDlpPath = QDir(exeDir).filePath("APIs/YTDLP/yt-dlp.exe");
+
+    QStringList args;
+    args << "-f" << "bestaudio"
+         << "--get-url"
+         << QString::fromStdString(url);
+
+    QProcess getUrlProcess;
+    getUrlProcess.setProgram(ytDlpPath);
+    getUrlProcess.setArguments(args);
+    getUrlProcess.start();
+    getUrlProcess.waitForFinished();
+
+    QString streamUrl = QString::fromUtf8(getUrlProcess.readAllStandardOutput()).trimmed();
+
+    if (streamUrl.isEmpty()) {
+        qDebug() << "[YTDLPManager] Failed to get stream URL!";
+        return;
+    }
+
+    qDebug() << "[YTDLPManager] Stream URL:" << streamUrl;
+
+    // Play the audio stream
+    mediaPlayer->setSource(QUrl(streamUrl));
+    mediaPlayer->play();
+}
+
+void YTDLPManager::stopSong() {
+    if (mediaPlayer->isPlaying()){
+        mediaPlayer->pause();
+    }else{
+        mediaPlayer->play();
+    }
+}
+
+void playSong(){ // add file here later
+
 }

@@ -524,7 +524,7 @@
             <property name="frameShadow">
              <enum>QFrame::Shadow::Raised</enum>
             </property>
-            <widget class="QLineEdit" name="lineEdit_2">
+            <widget class="QLineEdit" name="searchBar">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -532,6 +532,58 @@
                <width>371</width>
                <height>51</height>
               </rect>
+             </property>
+            </widget>
+            <widget class="QWidget" name="gridLayoutWidget_3">
+             <property name="geometry">
+              <rect>
+               <x>400</x>
+               <y>10</y>
+               <width>591</width>
+               <height>171</height>
+              </rect>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="0">
+               <widget class="QTreeWidget" name="searchList">
+                <property name="columnCount">
+                 <number>4</number>
+                </property>
+                <column>
+                 <property name="text">
+                  <string notr="true">1</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string notr="true">2</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string notr="true">3</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string notr="true">4</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QPushButton" name="searchButton">
+             <property name="geometry">
+              <rect>
+               <x>70</x>
+               <y>90</y>
+               <width>211</width>
+               <height>51</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Search</string>
              </property>
             </widget>
            </widget>

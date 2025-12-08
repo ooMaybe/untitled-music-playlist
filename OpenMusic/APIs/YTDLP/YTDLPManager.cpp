@@ -1,6 +1,11 @@
+#include <vector>
+#include <string>
 
-#include <fstream>
-#include <windows.h>
+#include <QCoreApplication>
+#include <QDir>
+#include <QProcess>
+#include <QFile>
+#include <QDebug>
 
 #include "APIs/Json/json.hpp"
 #include "YTDLPManager.h"
@@ -23,78 +28,71 @@ void YTDLPManager::setPaths(const std::string& ytdlp,
     outputFolder      = outputDir;
 }
 
-vector<SongResult> YTDLPManager::searchSongs(const string& query, int maxResults){
-    // Construct the command to search YouTube using yt-dlp
-    // Redirect output to a JSON file
-    // --flat-playlist to get individual video entries
-    // --no-playlist to avoid playlist processing
-    // --no-warnings to suppress warnings
-    // --skip-download to avoid downloading videos
-    // --dump-single-json to output JSON data
+std::vector<SongResult> YTDLPManager::searchSongs(const std::string& query, int limit) {
+    std::vector<SongResult> results;
 
-    cout << "[YTDLPManager] Searching for: " << query << endl;
+    QString exeDir = QCoreApplication::applicationDirPath();
+    QString ytDlpPath = QDir(exeDir).filePath("APIs/YTDLP/yt-dlp.exe");
+    QString searchResultsFile = QDir(exeDir).filePath("data/search_results.json");
 
-    string command = ytdlpPath + " --flat-playlist --no-playlist --no-warnings --skip-download --dump-single-json \"ytsearch" 
-                     + to_string(maxResults) + ":" + query + "\" > " + searchResultsFile;
-    FILE* pipe = _popen(command.c_str(), "r");
+    // Prepare QProcess
+    QProcess process;
+    QStringList args;
+    args << "--no-playlist"          // fetch full metadata
+         << "--no-warnings"
+         << "--skip-download"
+         << "--dump-single-json"
+         << QString("ytsearch%1:%2").arg(limit).arg(QString::fromStdString(query));
 
-    cout << "[YTDLPManager] Search completed!\n";
+    process.setProgram(ytDlpPath);
+    process.setArguments(args);
+    process.setStandardOutputFile(searchResultsFile);
+    process.setProcessChannelMode(QProcess::MergedChannels);
 
-    if (pipe){
-        // Close the pipe after execution to avoid resource leaks
-        _pclose(pipe);
-    }
+    qDebug() << "[YTDLPManager] Running yt-dlp via QProcess:" << ytDlpPath;
 
-    cout << "[YTDLPManager] Attempting to open: " << searchResultsFile << "\n";
-    vector<SongResult> results;
-    ifstream file(searchResultsFile);
-
-    if (!file.is_open()) {
-        cerr << "[YTDLPManager] Failed to open JSON file: " << searchResultsFile << "\n";
+    process.start();
+    if (!process.waitForFinished()) {
+        qDebug() << "[YTDLPManager] yt-dlp failed to run!";
         return results;
     }
 
-    cout << "[YTDLPManager] File opened successfully!\n";
-    
-    // Proceed with reading and parsing the JSON file here
-    try{
-        json fileData = json::parse(file);
+    // Read JSON output
+    QFile file(searchResultsFile);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "[YTDLPManager] Failed to open JSON file:" << searchResultsFile;
+        return results;
+    }
 
-        if (!fileData.contains("entries") || !fileData["entries"].is_array()) {
-            cerr << "[YTDLPManager] JSON data does not contain 'entries' array.\n";
-            file.close();
-            return results;
-        }
+    QByteArray jsonData = file.readAll();
+    file.close();
 
-        for (const auto& item : fileData["entries"]) {
-            SongResult song;
-            song.id = item.value("id", "");
-            song.title = item.value("title", "");
-            song.uploader = item.value("uploader", "");
-            
-            // Duration is a double in the JSON, convert to string
-            double durationValue = item.value("duration", 0.0);
-            song.duration = to_string(static_cast<int>(durationValue));
-            
-            // Thumbnail is in a thumbnails array, not a string field
-            if (item.contains("thumbnails") && item["thumbnails"].is_array() && !item["thumbnails"].empty()) {
-                song.thumbnail = item["thumbnails"][0].value("url", "");
+    if (jsonData.isEmpty()) {
+        qDebug() << "[YTDLPManager] yt-dlp returned empty JSON!";
+        return results;
+    }
+
+    // Parse JSON
+    try {
+        json data = json::parse(jsonData.constData());
+        for (auto& item : data["entries"]) {
+            SongResult s;
+            s.title    = item.value("title", "Unknown");
+            s.uploader = item.value("uploader", "Unknown");
+            s.url      = item.value("webpage_url", "");
+
+            // Get duration in seconds, default 0
+            if (item.contains("duration") && item["duration"].is_number()) {
+                s.duration = std::to_string(item["duration"].get<int>());
             } else {
-                song.thumbnail = "";
+                s.duration = "0";
             }
-            
-            song.url = "https://www.youtube.com/watch?v=" + song.id;
 
-            results.push_back(song);
+            results.push_back(s);
         }
-
-        file.close();
-        cout << "[YTDLPManager] Parsed " << results.size() << " results from JSON file.\n";
-    }catch(json::parse_error& ex){
-        cerr << "[YTDLPManager] Failed to parse JSON data from file: " << searchResultsFile << ". Error: " << ex.what() << "\n";
-        file.close();
-        return results;
+    } catch (json::parse_error& e) {
+        qDebug() << "[YTDLPManager] Failed to parse JSON:" << e.what();
     }
-    
+
     return results;
 }

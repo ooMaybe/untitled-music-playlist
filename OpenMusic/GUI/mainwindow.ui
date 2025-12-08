@@ -274,6 +274,17 @@
              <string>Songs: 0</string>
             </property>
            </widget>
+          <widget class="QTreeWidget" name="sideBarPlaylist">
+           <column>
+            <property name="text">
+             <string>Icon</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Name</string>
+            </property>
+           </column>
           </widget>
          </item>
         </layout>
@@ -295,7 +306,7 @@
       <property name="frameShadow">
        <enum>QFrame::Shadow::Raised</enum>
       </property>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="homeButton">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -504,7 +515,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_3">
       <widget class="QFrame" name="maining">
@@ -857,8 +868,21 @@
              <property name="frameShadow">
               <enum>QFrame::Shadow::Raised</enum>
              </property>
+             <widget class="QLabel" name="labelPlaylistImageMain">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>261</width>
+                <height>231</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
             </widget>
-            <widget class="QLineEdit" name="lineEdit_14">
+            <widget class="QLineEdit" name="mainPlaylistName">
              <property name="geometry">
               <rect>
                <x>320</x>
@@ -867,6 +891,11 @@
                <height>81</height>
               </rect>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>41</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Playlist name</string>
              </property>
@@ -874,8 +903,8 @@
             <widget class="QLineEdit" name="lineEdit_15">
              <property name="geometry">
               <rect>
-               <x>330</x>
-               <y>230</y>
+               <x>320</x>
+               <y>160</y>
                <width>191</width>
                <height>24</height>
               </rect>
@@ -894,6 +923,47 @@
             <property name="frameShadow">
              <enum>QFrame::Shadow::Raised</enum>
             </property>
+            <widget class="QWidget" name="verticalLayoutWidget_2">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>1001</width>
+               <height>301</height>
+              </rect>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QTreeWidget" name="mainPlaylistTree">
+                <column>
+                 <property name="text">
+                  <string>Icon</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Name</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Artist</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Duration</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Date Added</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
          </layout>

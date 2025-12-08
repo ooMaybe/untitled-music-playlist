@@ -2,6 +2,7 @@
 #include <QTimer>
 #include <QFileIconProvider>
 #include <QDir>
+#include <QLabel>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -13,7 +14,6 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Initialize network manager for loading images
     networkManager = new QNetworkAccessManager(this);
 
     // Tree widget for the other one (songsDownload)
@@ -28,7 +28,6 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     ui->searchList->setColumnWidth(0, 250);
     ui->searchList->setIconSize(QSize(64, 64));
 
-    // Context Menu
     ui->searchList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->searchList, &QWidget::customContextMenuRequested,
             this, &MainWindow::on_searchList_customContextMenuRequested);
@@ -68,6 +67,38 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::addToPlaylistPage(const QString &titleName,
+                                   const QString &titleArtist,
+                                   const QString &titleDuration,
+                                   const QString &titleDate,
+                                   const QPixmap &icon)
+{
+    auto *tree = ui->mainPlaylistTree;
+    tree->setColumnCount(5);
+    tree->setHeaderLabels({"Icon", "Name", "Artist", "Duration", "Date Added"});
+    tree->setIconSize(QSize(64, 64));
+    tree->setColumnWidth(0, 80);
+    tree->setUniformRowHeights(false);
+
+    QTreeWidgetItem *item = new QTreeWidgetItem(tree);
+    tree->addTopLevelItem(item);
+
+    auto *iconLabel = new QLabel(tree);
+    iconLabel->setPixmap(icon.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    iconLabel->setAlignment(Qt::AlignCenter);
+    tree->setItemWidget(item, 0, iconLabel);
+
+    item->setText(1, titleName);
+    item->setText(2, titleArtist);
+    item->setText(3, titleDuration);
+    item->setText(4, titleDate);
+
+    tree->setStyleSheet(
+        "QTreeWidget::item { padding-left: 10px; }"
+        );
+}
+
 
 void MainWindow::addSearch(const QString &titleName,
                            const QString &titleArtist,
@@ -175,6 +206,41 @@ void MainWindow::on_searchButton_clicked()
                   QPixmap(":/icons/music.png"),
                   QString::fromStdString(s.url),
                   QString::fromStdString(s.thumbnail));
+    }
+}
+
+void MainWindow::on_sideBarPlaylist_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidgetItem *item = ui->sideBarPlaylist->itemAt(pos);
+    if (!item) return;
+
+    QMenu menu(this);
+
+    QAction *openAction = menu.addAction("Open");
+    QAction *removeAction = menu.addAction("Remove");
+
+    QAction *chosen = menu.exec(ui->sideBarPlaylist->viewport()->mapToGlobal(pos));
+    if (!chosen) return;
+
+    ui->stackedWidget->setCurrentIndex(1);
+
+    if (chosen == openAction) {
+
+        QWidget *widget = ui->sideBarPlaylist->itemWidget(item, 0);
+        auto *label = qobject_cast<QLabel*>(widget);
+
+        QPixmap pixmap = label->pixmap();
+
+        ui->labelPlaylistImageMain->setPixmap(
+            pixmap.scaled(ui->labelPlaylistImageMain->size(),
+                          Qt::KeepAspectRatio,
+                          Qt::SmoothTransformation)
+            );
+
+        ui->mainPlaylistName->setText(item->text(1));
+
+    } else if (chosen == removeAction) {
+        delete item;
     }
 }
 

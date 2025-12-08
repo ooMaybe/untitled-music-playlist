@@ -46,9 +46,12 @@ void handleSetup() {
     projectRoot.cdUp();  // build
     // Now we're at OpenMusic folder
 
-    QString sourceFilePath = projectRoot.filePath("APIs/YTDLP/yt-dlp.exe");
     QString targetDirPath = dir.filePath("APIs/YTDLP");
+    QString sourceFilePath = projectRoot.filePath("APIs/YTDLP/yt-dlp.exe");
     QString targetFilePath = dir.filePath("APIs/YTDLP/yt-dlp.exe");
+
+    QString ffmpegSourcePath = projectRoot.filePath("APIs/YTDLP/ffmpeg.exe");
+    QString ffmpegTargetPath = dir.filePath("APIs/YTDLP/ffmpeg.exe");
 
     // Create target directory
     QDir().mkpath(targetDirPath);
@@ -67,7 +70,22 @@ void handleSetup() {
         std::cout << "[Setup] yt-dlp.exe already exists at target.\n";
     }
 
-    std::string ytdlpPath =dir.filePath("APIs/YTDLP/yt-dlp.exe").toStdString();
+    // Copys the ffmpeg
+    if (!QFile::exists(ffmpegTargetPath)) {
+        if (QFile::exists(ffmpegSourcePath)) {
+            if (QFile::copy(ffmpegSourcePath, ffmpegTargetPath)) {
+                std::cout << "[Setup] Copied ffmpeg.exe to runtime API folder.\n";
+            } else {
+                std::cerr << "[Setup] Failed to copy ffmpeg.exe!\n";
+            }
+        } else {
+            std::cerr << "[Setup] Source ffmpeg.exe not found!\n";
+        }
+    } else {
+        std::cout << "[Setup] ffmpeg.exe already exists at target.\n";
+    }
+
+    std::string ytdlpPath = dir.filePath("APIs/YTDLP/yt-dlp.exe").toStdString();
     std::string searchResultsFile =dir.filePath("data/search_results.json").toStdString();
     std::string outputFolder =dir.filePath("data/Downloads/").toStdString();
     std::string databasePath = dir.filePath("data/OpenMusic.db").toStdString();

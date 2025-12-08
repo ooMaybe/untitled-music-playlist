@@ -89,135 +89,194 @@
       <property name="frameShadow">
        <enum>QFrame::Shadow::Raised</enum>
       </property>
-      <widget class="QFrame" name="frame_8">
+      <widget class="QScrollArea" name="scrollArea_2">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>237</width>
-         <height>371</height>
+         <x>0</x>
+         <y>0</y>
+         <width>261</width>
+         <height>531</height>
         </rect>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::Shape::StyledPanel</enum>
+       <property name="widgetResizable">
+        <bool>true</bool>
        </property>
-       <property name="frameShadow">
-        <enum>QFrame::Shadow::Raised</enum>
-       </property>
-       <widget class="QFrame" name="frame_11">
+       <widget class="QWidget" name="scrollAreaWidgetContents_2">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>241</width>
-          <height>41</height>
+          <width>259</width>
+          <height>529</height>
          </rect>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::Shape::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Shadow::Raised</enum>
-        </property>
-        <widget class="QLineEdit" name="lineEdit_5">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>113</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Playlist</string>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="verticalLayoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>40</y>
-          <width>231</width>
-          <height>331</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QListWidget" name="sidePlaylistList"/>
+          <widget class="QFrame" name="frame_8">
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Raised</enum>
+           </property>
+           <widget class="QFrame" name="frame_11">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>241</width>
+              <height>41</height>
+             </rect>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Shape::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <widget class="QLineEdit" name="lineEdit_5">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>10</y>
+               <width>113</width>
+               <height>24</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Playlist</string>
+             </property>
+            </widget>
+           </widget>
+           <widget class="QWidget" name="verticalLayoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>40</y>
+              <width>241</width>
+              <height>131</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_3"/>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_9">
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Raised</enum>
+           </property>
+           <widget class="QFrame" name="frame_12">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>241</width>
+              <height>41</height>
+             </rect>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Shape::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <widget class="QLineEdit" name="lineEdit_6">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>10</y>
+               <width>113</width>
+               <height>24</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Songs</string>
+             </property>
+            </widget>
+           </widget>
+           <widget class="QWidget" name="verticalLayoutWidget_2">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>40</y>
+              <width>241</width>
+              <height>131</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_5"/>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_10">
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Raised</enum>
+           </property>
+           <widget class="QFrame" name="frame_13">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>241</width>
+              <height>41</height>
+             </rect>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Shape::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <widget class="QLineEdit" name="lineEdit_7">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>10</y>
+               <width>113</width>
+               <height>24</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Statistics</string>
+             </property>
+            </widget>
+           </widget>
+           <widget class="QLineEdit" name="lineEdit_10">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>50</y>
+              <width>181</width>
+              <height>21</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Playlist: 0</string>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="lineEdit_11">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>80</y>
+              <width>181</width>
+              <height>21</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Songs: 0</string>
+            </property>
+           </widget>
+          </widget>
          </item>
         </layout>
-       </widget>
-      </widget>
-      <widget class="QFrame" name="frame_10">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>390</y>
-         <width>241</width>
-         <height>111</height>
-        </rect>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::Shape::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Shadow::Raised</enum>
-       </property>
-       <widget class="QFrame" name="frame_13">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>241</width>
-          <height>41</height>
-         </rect>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::Shape::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Shadow::Raised</enum>
-        </property>
-        <widget class="QLineEdit" name="lineEdit_7">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>113</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Statistics</string>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QLineEdit" name="lineEdit_10">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>50</y>
-          <width>181</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Playlist: 0</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="lineEdit_11">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>181</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Songs: 0</string>
-        </property>
        </widget>
       </widget>
      </widget>
@@ -240,7 +299,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>70</y>
          <width>261</width>
          <height>41</height>
         </rect>
@@ -253,23 +312,10 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>50</y>
+         <y>130</y>
          <width>261</width>
          <height>51</height>
         </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_6">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>110</y>
-         <width>211</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Search</string>
        </property>
       </widget>
      </widget>
@@ -429,6 +475,9 @@
        <property name="text">
         <string>Song</string>
        </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
       </widget>
       <widget class="QLineEdit" name="playlistBoxName">
        <property name="geometry">
@@ -576,34 +625,6 @@
               <string>Search for a song...</string>
              </property>
             </widget>
-            <widget class="QWidget" name="gridLayoutWidget_3">
-             <property name="geometry">
-              <rect>
-               <x>400</x>
-               <y>10</y>
-               <width>591</width>
-               <height>171</height>
-              </rect>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_3">
-              <item row="0" column="0">
-               <widget class="QListWidget" name="searchList"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QPushButton" name="pushButton_5">
-             <property name="geometry">
-              <rect>
-               <x>70</x>
-               <y>90</y>
-               <width>211</width>
-               <height>51</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Search</string>
-             </property>
-            </widget>
            </widget>
           </item>
           <item>
@@ -738,17 +759,31 @@
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_2">
-               <item row="0" column="0">
-                <widget class="QListWidget" name="SongHomeList">
-                 <property name="verticalScrollBarPolicy">
-                  <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+               <item row="1" column="0">
+                <widget class="QTreeWidget" name="songsDownload">
+                 <property name="columnCount">
+                  <number>4</number>
                  </property>
-                 <property name="horizontalScrollBarPolicy">
-                  <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-                 </property>
-                 <property name="sizeAdjustPolicy">
-                  <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
-                 </property>
+                 <column>
+                  <property name="text">
+                   <string notr="true">1</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string notr="true">2</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string notr="true">3</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string notr="true">4</string>
+                  </property>
+                 </column>
                 </widget>
                </item>
               </layout>

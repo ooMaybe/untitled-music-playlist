@@ -45,7 +45,7 @@ public:
     std::vector<SongResult> searchSongs(const std::string& query, int maxResults = 10);
     
     // Download a song by URL to specified output path
-    bool downloadSong(const std::string& url, const std::string& outputPath);
+    bool downloadSong(const std::string& url, const std::string& title);
     
     // Get song info by URL
     SongResult getSongInfo(const std::string& url);

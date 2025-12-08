@@ -6,6 +6,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QLabel>
+#include <QTreeWidget>
 
 #include "APIs/YTDLP/YTDLPManager.h"
 
@@ -35,6 +36,7 @@ private slots:
     void on_stopButton_clicked();
 
     void loadThumbnail(const QString &url, QLabel *label);
+    void loadThumbnailForTreeItem(const QString &url, QTreeWidgetItem *item);  // ADD THIS
 
 private:
     Ui::MainWindow *ui;
@@ -45,7 +47,8 @@ private:
                  const QString &titleArtist,
                  const QString &titleDuration,
                  const QString &titleDate,
-                 const QPixmap &icon);
+                 const QPixmap &icon,
+                 const QString &filePath);
 
     void addPlaylist(const QString &titleName,
                        const QString &titleNumSong,
@@ -58,12 +61,5 @@ private:
                    const QPixmap &icon,
                    const QString &url,
                    const QString &thumbnail);
-                 const QString &titleArtist,
-                 const QString &titleDuration,
-                 const QString &titleDate,
-                 const QPixmap &icon);
-
-    void addSidePlaylist(const QString &titleName,
-                    const QPixmap &icon);
 };
 #endif // MAINWINDOW_H

@@ -19,4 +19,4 @@ private:
     Ui::playlistpage *ui;
 };
 
-#endif // PLAYLISTPAGE_H
+#endif 

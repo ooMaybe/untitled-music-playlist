@@ -22,4 +22,4 @@ private:
     Ui::PlaylistListWidgetYes *ui;
 };
 
-#endif // PLAYLISTLISTWIDGETYES_H
+#endif 

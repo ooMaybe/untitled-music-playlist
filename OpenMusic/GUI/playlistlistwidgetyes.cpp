@@ -27,5 +27,5 @@ void PlaylistListWidgetYes::setNumSong(const QString &titleNum)
 void PlaylistListWidgetYes::setIconPlaylist(const QPixmap &pixmap)
 {
     ui->labelIcon->setPixmap(pixmap);
-    ui->labelIcon->setScaledContents(true); // so it fits nicely
+    ui->labelIcon->setScaledContents(true);
 }

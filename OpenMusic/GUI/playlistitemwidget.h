@@ -25,4 +25,4 @@ private:
     Ui::PlaylistItemWidget *ui;
 };
 
-#endif // PLAYLISTITEMWIDGET_H
+#endif

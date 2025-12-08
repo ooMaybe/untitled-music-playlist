@@ -38,6 +38,8 @@ private slots:
     void loadThumbnail(const QString &url, QLabel *label);
     void loadThumbnailForTreeItem(const QString &url, QTreeWidgetItem *item);  // ADD THIS
 
+    void on_songsDownload_customContextMenuRequested(const QPoint &pos);
+
 private:
     Ui::MainWindow *ui;
     YTDLPManager &ytdlpManager;

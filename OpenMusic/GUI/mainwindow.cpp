@@ -1,6 +1,7 @@
 #include <QMessageBox>
 #include <QTimer>
 #include <QFileIconProvider>
+#include <QDir>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -31,6 +32,11 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     ui->searchList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->searchList, &QWidget::customContextMenuRequested,
             this, &MainWindow::on_searchList_customContextMenuRequested);
+
+    // Context Menu for songsDownload
+    ui->songsDownload->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->songsDownload, &QWidget::customContextMenuRequested,
+            this, &MainWindow::on_songsDownload_customContextMenuRequested);
 
     // Connect media player signals to UI updates
     connect(ytdlpManager.getMediaPlayer(), &QMediaPlayer::positionChanged,
@@ -211,7 +217,33 @@ void MainWindow::on_searchList_customContextMenuRequested(const QPoint &pos)
         if (success) {
             QMessageBox::information(this, "Success", "Download complete!\n\nSaved to Downloads folder.");
 
-            addSong(item->text(0));
+            // Get paths
+            QString exeDir = QCoreApplication::applicationDirPath();
+            QString downloadFolder = QDir(exeDir).filePath("data/Downloads");
+
+            // Sanitize title (same as in YTDLPManager)
+            QString safeTitle = item->text(0);
+            safeTitle.replace(QRegularExpression("[<>:\"/\\\\|?*]"), "");
+
+            QString mp3Path = QDir(downloadFolder).filePath(safeTitle + ".mp3");
+            QString pngPath = QDir(downloadFolder).filePath(safeTitle + ".png");
+
+            // Load thumbnail
+            QPixmap thumbnail;
+            if (QFile::exists(pngPath)) {
+                thumbnail.load(pngPath);
+                thumbnail = thumbnail.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            } else {
+                thumbnail = QPixmap(":/icons/music.png");
+            }
+
+            // Add to songsDownload tree widget
+            addSong(item->text(0),           // Title
+                    item->text(1),           // Artist
+                    item->text(2),           // Duration
+                    QDateTime::currentDateTime().toString("MMM d, yyyy"),  // Date
+                    thumbnail,               // Thumbnail
+                    mp3Path);                // File path
 
         } else {
             QMessageBox::critical(this, "Error", "Download failed!");
@@ -347,3 +379,76 @@ void MainWindow::loadThumbnailForTreeItem(const QString &url, QTreeWidgetItem *i
         reply->deleteLater();
     });
 }
+
+void MainWindow::on_songsDownload_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidgetItem *item = ui->songsDownload->itemAt(pos);
+    if (!item) return;
+
+    QMenu menu(this);
+
+    QAction *playAction = menu.addAction(style()->standardIcon(QStyle::SP_MediaPlay), "Play");
+    QAction *deleteAction = menu.addAction(style()->standardIcon(QStyle::SP_TrashIcon), "Delete");
+
+    QAction *chosen = menu.exec(ui->songsDownload->viewport()->mapToGlobal(pos));
+    if (!chosen)
+        return;
+
+    QString filePath = item->data(0, Qt::UserRole).toString();
+
+    if (chosen == playAction) {
+        qDebug() << "[MainWindow] Playing local file:" << filePath;
+
+        if (QFile::exists(filePath)) {
+            // Play from LOCAL FILE (not URL!)
+            ytdlpManager.getMediaPlayer()->setSource(QUrl::fromLocalFile(filePath));
+            ytdlpManager.getMediaPlayer()->play();
+
+            ui->songNameBox->setText(item->text(0));
+
+            // Load thumbnail from local PNG
+            QString pngPath = filePath;
+            pngPath.replace(".mp3", ".png");
+
+            if (QFile::exists(pngPath)) {
+                QPixmap pixmap(pngPath);
+                ui->songImage->setPixmap(pixmap.scaled(ui->songImage->size(),
+                                                       Qt::KeepAspectRatio,
+                                                       Qt::SmoothTransformation));
+            } else {
+                ui->songImage->setPixmap(QPixmap(":/icons/music.png"));
+            }
+
+            ui->stopButton->setText("Stop");
+        } else {
+            QMessageBox::warning(this, "Error", "File not found!\n\n" + filePath);
+        }
+
+    } else if (chosen == deleteAction) {
+        auto reply = QMessageBox::question(this, "Delete Song",
+                                           "Are you sure you want to delete:\n" + item->text(0),
+                                           QMessageBox::Yes | QMessageBox::No);
+
+        if (reply == QMessageBox::Yes) {
+            ytdlpManager.getMediaPlayer()->setSource(QUrl());
+
+            // Delete MP3 file
+            if (QFile::exists(filePath)) {
+                QFile::remove(filePath);
+            }
+
+            // Delete PNG thumbnail
+            QString pngPath = filePath;
+            pngPath.replace(".mp3", ".png");
+            if (QFile::exists(pngPath)) {
+                QFile::remove(pngPath);
+            }
+
+            // Remove from tree
+            delete item;
+
+            qDebug() << "[MainWindow] Deleted:" << filePath;
+        }
+    }
+}
+

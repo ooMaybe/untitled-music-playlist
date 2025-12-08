@@ -439,7 +439,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_3">
       <widget class="QFrame" name="maining">
@@ -743,8 +743,11 @@
              <property name="text">
               <string>Playlist name</string>
              </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
             </widget>
-            <widget class="QLineEdit" name="lineEdit_15">
+            <widget class="QLineEdit" name="songDurationLabel">
              <property name="geometry">
               <rect>
                <x>320</x>
@@ -755,6 +758,57 @@
              </property>
              <property name="text">
               <string># songs, 0 hr 0 min</string>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+            <widget class="QComboBox" name="sortSelection">
+             <property name="geometry">
+              <rect>
+               <x>754</x>
+               <y>263</y>
+               <width>181</width>
+               <height>31</height>
+              </rect>
+             </property>
+             <item>
+              <property name="text">
+               <string>Alphabetical</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Reverse Alphabetical</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Duration</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Reverse Duration</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Random</string>
+              </property>
+             </item>
+            </widget>
+            <widget class="QLabel" name="label_2">
+             <property name="geometry">
+              <rect>
+               <x>760</x>
+               <y>240</y>
+               <width>49</width>
+               <height>16</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Sort By</string>
              </property>
             </widget>
            </widget>

@@ -55,6 +55,8 @@ private slots:
     
     void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
 
+    void on_sortSelection_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
     YTDLPManager &ytdlpManager;
@@ -87,9 +89,11 @@ private:
                                        const QString &titleArtist,
                                        const QString &titleDuration,
                                        const QString &titleDate,
-                           const QPixmap &icon);
+                                       const QPixmap &icon);
 
     void addSidePlaylist(const QString &titleName,
                                      const QPixmap &icon);
+
+    void playNextSongInPlaylist();
 };
 #endif // MAINWINDOW_H

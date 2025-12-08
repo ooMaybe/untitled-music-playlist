@@ -4,6 +4,10 @@
 #include <QDir>
 #include <QLabel>
 #include <QFileDialog>
+#include <random>
+#include <vector>
+#include <algorithm>
+#include <string>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -252,7 +256,17 @@ void MainWindow::on_sideBarPlaylist_customContextMenuRequested(const QPoint &pos
         
         // Load songs from database
         ui->mainPlaylistTree->clear();
+        
+        // Configure tree structure
+        ui->mainPlaylistTree->setColumnCount(5);
+        ui->mainPlaylistTree->setHeaderLabels({"Icon", "Name", "Artist", "Duration", "Date Added"});
+        ui->mainPlaylistTree->setIconSize(QSize(64, 64));
+        ui->mainPlaylistTree->setColumnWidth(0, 80);
+        ui->mainPlaylistTree->setUniformRowHeights(false);
+        
         std::vector<PlaylistSong> songs = backend.getPlaylistSongs(currentPlaylist.toStdString());
+        
+        int totalSeconds = 0;
         
         for (const auto& song : songs) {
             QPixmap thumbnail;
@@ -263,6 +277,7 @@ void MainWindow::on_sideBarPlaylist_customContextMenuRequested(const QPoint &pos
             }
             
             QTreeWidgetItem *songItem = new QTreeWidgetItem(ui->mainPlaylistTree);
+            ui->mainPlaylistTree->addTopLevelItem(songItem);
             
             auto *iconLabel = new QLabel(ui->mainPlaylistTree);
             iconLabel->setPixmap(thumbnail.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -278,8 +293,22 @@ void MainWindow::on_sideBarPlaylist_customContextMenuRequested(const QPoint &pos
             songItem->setData(0, Qt::UserRole, song.id);
             songItem->setData(0, Qt::UserRole + 1, QString::fromStdString(song.filePath));
             
-            ui->mainPlaylistTree->addTopLevelItem(songItem);
+            // Parse duration and add to total
+            QString durationStr = QString::fromStdString(song.duration);
+            QStringList parts = durationStr.split(":");
+            if (parts.size() == 2) {
+                totalSeconds += parts[0].toInt() * 60 + parts[1].toInt();
+            }
         }
+        
+        // Update duration label
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
+        QString durationText = QString("%1 songs, %2 hr %3 min")
+            .arg(songs.size())
+            .arg(hours)
+            .arg(minutes);
+        ui->songDurationLabel->setText(durationText);
         
     } else if (chosen == removeAction) {
         QString playlistName = item->text(1);
@@ -324,6 +353,7 @@ void MainWindow::on_searchList_customContextMenuRequested(const QPoint &pos)
         
         isPlayingFromFile = false;  // Playing from web URL
         currentSongIndex = -1;  // Not playing from playlist, disable auto-play
+        ui->playlistBoxName->setText("");  // Clear playlist name
 
         // Try to please load thumbnail :D
         loadThumbnail(thumbnail, ui->songImage);
@@ -559,6 +589,7 @@ void MainWindow::on_songsDownload_customContextMenuRequested(const QPoint &pos)
             
             isPlayingFromFile = true;  // Playing from local file
             currentSongIndex = -1;  // Not playing from playlist, disable auto-play
+            ui->playlistBoxName->setText("");  // Clear playlist name
 
             ui->songNameBox->setText(item->text(0));
 
@@ -684,6 +715,7 @@ void MainWindow::on_mainPlaylistTree_customContextMenuRequested(const QPoint &po
             currentSongIndex = ui->mainPlaylistTree->indexOfTopLevelItem(item);  // Track position for auto-play
 
             ui->songNameBox->setText(item->text(1));
+            ui->playlistBoxName->setText(currentPlaylist);  // Show playlist name
 
             // Load thumbnail
             QString pngPath = filePath;
@@ -906,6 +938,7 @@ void MainWindow::playNextSongInPlaylist()
         ytdlpManager.getMediaPlayer()->play();
         
         ui->songNameBox->setText(nextItem->text(1));
+        ui->playlistBoxName->setText(currentPlaylist);  // Show playlist name
         
         // Load thumbnail
         QString pngPath = filePath;
@@ -927,3 +960,91 @@ void MainWindow::playNextSongInPlaylist()
     }
 }
 
+void MainWindow::on_sortSelection_currentIndexChanged(int index)
+{
+    // Helper function to parse "MM:SS" duration format
+    auto parseDuration = [](const QString &duration) -> int {
+        QStringList parts = duration.split(":");
+        if (parts.size() == 2) {
+            return parts[0].toInt() * 60 + parts[1].toInt(); // convert to total seconds
+        }
+        return duration.toInt(); // fallback if format unexpected
+    };
+
+    // Extract existing items and their icon pixmaps
+    struct ItemData {
+        QTreeWidgetItem *item;
+        QPixmap iconPixmap;
+    };
+    
+    QList<ItemData> itemDataList;
+    
+    while (ui->mainPlaylistTree->topLevelItemCount() > 0) {
+        QTreeWidgetItem *item = ui->mainPlaylistTree->takeTopLevelItem(0);
+        
+        // Get the pixmap from the widget before it's destroyed
+        QPixmap pixmap;
+        QWidget *widget = ui->mainPlaylistTree->itemWidget(item, 0);
+        if (widget) {
+            QLabel *label = qobject_cast<QLabel*>(widget);
+            if (label) {
+                pixmap = label->pixmap(Qt::ReturnByValue);
+            }
+        }
+        
+        itemDataList.append({item, pixmap});
+    }
+
+    // Apply selected sorting method
+    switch (index)
+    {
+    case 0: // Title A-Z
+        std::sort(itemDataList.begin(), itemDataList.end(),
+                  [](const ItemData &a, const ItemData &b) {
+                      return a.item->text(1).compare(b.item->text(1), Qt::CaseInsensitive) < 0;
+                  });
+        break;
+
+    case 1: // Title Z-A
+        std::sort(itemDataList.begin(), itemDataList.end(),
+                  [](const ItemData &a, const ItemData &b) {
+                      return a.item->text(1).compare(b.item->text(1), Qt::CaseInsensitive) > 0;
+                  });
+        break;
+
+    case 2: // Duration Short → Long
+        std::sort(itemDataList.begin(), itemDataList.end(),
+                  [&](const ItemData &a, const ItemData &b) {
+                      return parseDuration(a.item->text(3)) < parseDuration(b.item->text(3));
+                  });
+        break;
+
+    case 3: // Duration Long → Short
+        std::sort(itemDataList.begin(), itemDataList.end(),
+                  [&](const ItemData &a, const ItemData &b) {
+                      return parseDuration(a.item->text(3)) > parseDuration(b.item->text(3));
+                  });
+        break;
+
+    case 4: // Random Shuffle
+    {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(itemDataList.begin(), itemDataList.end(), g);
+    }
+    break;
+    }
+
+    // Re-insert sorted items back into the tree and recreate their icon widgets
+    for (const auto &data : itemDataList) {
+        ui->mainPlaylistTree->addTopLevelItem(data.item);
+        
+        // Recreate the icon label widget
+        if (!data.iconPixmap.isNull()) {
+            QLabel *iconLabel = new QLabel(ui->mainPlaylistTree);
+            iconLabel->setPixmap(data.iconPixmap);
+            iconLabel->setAlignment(Qt::AlignCenter);
+            ui->mainPlaylistTree->setItemWidget(data.item, 0, iconLabel);
+        }
+    }
+}

@@ -518,3 +518,8 @@ void MainWindow::on_songsDownload_customContextMenuRequested(const QPoint &pos)
     }
 }
 
+void MainWindow::on_homeButton_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+    qDebug() << "Hi";
+}

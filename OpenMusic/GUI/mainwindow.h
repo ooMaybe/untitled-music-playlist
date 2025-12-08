@@ -40,9 +40,6 @@ private slots:
     void loadThumbnailForTreeItem(const QString &url, QTreeWidgetItem *item);  // ADD THIS
 
     void on_songsDownload_customContextMenuRequested(const QPoint &pos);
-
-    void on_pushButton_clicked();
-
     void on_homeButton_clicked();
 
 private:
@@ -68,5 +65,11 @@ private:
                    const QPixmap &icon,
                    const QString &url,
                    const QString &thumbnail);
+
+    void addToPlaylistPage(const QString &titleName,
+                                       const QString &titleArtist,
+                                       const QString &titleDuration,
+                                       const QString &titleDate,
+                           const QPixmap &icon);
 };
 #endif // MAINWINDOW_H

@@ -913,6 +913,54 @@
               <string># songs, 0 hr 0 min</string>
              </property>
             </widget>
+            <widget class="QComboBox" name="sortSelection">
+             <property name="geometry">
+              <rect>
+               <x>840</x>
+               <y>260</y>
+               <width>111</width>
+               <height>24</height>
+              </rect>
+             </property>
+             <item>
+              <property name="text">
+               <string>Alphabetical</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Reverse - Alphabetical</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Duration</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Reverse - Duration</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Random</string>
+              </property>
+             </item>
+            </widget>
+            <widget class="QLabel" name="label">
+             <property name="geometry">
+              <rect>
+               <x>780</x>
+               <y>260</y>
+               <width>49</width>
+               <height>16</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Sort by:</string>
+             </property>
+            </widget>
            </widget>
           </item>
           <item>

@@ -3,6 +3,10 @@
 #include <QFileIconProvider>
 #include <QDir>
 #include <QLabel>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <random>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -47,6 +51,7 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
                 updateDuration(static_cast<int>(duration));
             });
 
+<<<<<<< Updated upstream
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
@@ -61,6 +66,22 @@ MainWindow::MainWindow(YTDLPManager &manager, QWidget *parent)
     addPlaylist("Canada", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Pee", "23", QPixmap(":/icons/music.png"));
     addPlaylist("Poop", "23", QPixmap(":/icons/music.png"));
+=======
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Norbu", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap(":/icons/music.png"));
+    addSidePlaylist("Alex", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+    addSidePlaylist("Alex", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+    addSidePlaylist("Karam", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+
+    addToPlaylistPage("Sorry", "Dany", "4:20", "January 6, 2020", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+    addToPlaylistPage("ASorry", "Dany", "5:20", "January 6, 2020", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+    addToPlaylistPage("BSorry", "Dany", "7:20", "January 6, 2020", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+    addToPlaylistPage("CSorry", "Dany", "9:20", "January 6, 2020", QPixmap("C:\\Users\\phomm\\Downloads\\7fc832400bfc5bad5ed10ee7a9b802f3"));
+>>>>>>> Stashed changes
 }
 
 MainWindow::~MainWindow()
@@ -75,29 +96,40 @@ void MainWindow::addToPlaylistPage(const QString &titleName,
                                    const QPixmap &icon)
 {
     auto *tree = ui->mainPlaylistTree;
+
+    // Set up columns once (safe to call multiple times)
     tree->setColumnCount(5);
     tree->setHeaderLabels({"Icon", "Name", "Artist", "Duration", "Date Added"});
     tree->setIconSize(QSize(64, 64));
-    tree->setColumnWidth(0, 80);
-    tree->setUniformRowHeights(false);
+    tree->setColumnWidth(0, 150);
+    tree->setUniformRowHeights(true);
 
-    QTreeWidgetItem *item = new QTreeWidgetItem(tree);
-    tree->addTopLevelItem(item);
+    QTreeWidgetItem *item = new QTreeWidgetItem();
 
-    auto *iconLabel = new QLabel(tree);
-    iconLabel->setPixmap(icon.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    iconLabel->setAlignment(Qt::AlignCenter);
-    tree->setItemWidget(item, 0, iconLabel);
+    // 🚫 DO NOT put the title in column 0
+    // item->setText(0, titleName);  // <-- REMOVE / DON'T DO THIS
 
-    item->setText(1, titleName);
-    item->setText(2, titleArtist);
+    // ✅ Column 0: icon only
+    QPixmap scaled = icon.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    item->setIcon(0, QIcon(scaled));
+    item->setText(0, " ");  // optional small spacer so column has width
+
+    // ✅ Column 1+: text
+    item->setText(1, titleName);   // Name
+    item->setText(2, titleArtist); // Artist
     item->setText(3, titleDuration);
     item->setText(4, titleDate);
 
+    tree->addTopLevelItem(item);
+
+    // Optional padding
     tree->setStyleSheet(
-        "QTreeWidget::item { padding-left: 10px; }"
+        "QTreeWidget::item { padding-left: 6px; }"
         );
 }
+
+
+
 
 
 void MainWindow::addSearch(const QString &titleName,
@@ -518,3 +550,76 @@ void MainWindow::on_songsDownload_customContextMenuRequested(const QPoint &pos)
     }
 }
 
+<<<<<<< Updated upstream
+=======
+void MainWindow::on_homeButton_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+    qDebug() << "Hi";
+}
+
+void MainWindow::on_sortSelection_currentIndexChanged(int index)
+{
+    // Helper function to parse "MM:SS" duration format
+    auto parseDuration = [](const QString &duration) -> int {
+        QStringList parts = duration.split(":");
+        if (parts.size() == 2) {
+            return parts[0].toInt() * 60 + parts[1].toInt(); // convert to total seconds
+        }
+        return duration.toInt(); // fallback if format unexpected
+    };
+
+    // Extract existing items safely (not deleting them)
+    QList<QTreeWidgetItem*> items;
+    while (ui->mainPlaylistTree->topLevelItemCount() > 0) {
+        items.append(ui->mainPlaylistTree->takeTopLevelItem(0));
+    }
+
+    // Apply selected sorting method
+    switch (index)
+    {
+    case 0: // Title A-Z
+        std::sort(items.begin(), items.end(),
+                  [](QTreeWidgetItem *a, QTreeWidgetItem *b) {
+                      return a->text(1).compare(b->text(1), Qt::CaseInsensitive) < 0;
+                  });
+        break;
+
+    case 1: // Title Z-A
+        std::sort(items.begin(), items.end(),
+                  [](QTreeWidgetItem *a, QTreeWidgetItem *b) {
+                      return a->text(1).compare(b->text(1), Qt::CaseInsensitive) > 0;
+                  });
+        break;
+
+    case 2: // Duration Short → Long
+        std::sort(items.begin(), items.end(),
+                  [&](QTreeWidgetItem *a, QTreeWidgetItem *b) {
+                      return parseDuration(a->text(3)) < parseDuration(b->text(3));
+                  });
+        break;
+
+    case 3: // Duration Long → Short
+        std::sort(items.begin(), items.end(),
+                  [&](QTreeWidgetItem *a, QTreeWidgetItem *b) {
+                      return parseDuration(a->text(3)) > parseDuration(b->text(3));
+                  });
+        break;
+
+    case 4: // Random Shuffle
+    {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(items.begin(), items.end(), g);
+    }
+    break;
+    }
+
+    // Re-insert sorted items back into the tree
+    for (auto *item : items) {
+        ui->mainPlaylistTree->addTopLevelItem(item);
+    }
+}
+
+
+>>>>>>> Stashed changes

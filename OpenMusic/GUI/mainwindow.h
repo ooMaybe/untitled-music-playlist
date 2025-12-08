@@ -45,6 +45,9 @@ private slots:
 
     void on_homeButton_clicked();
 
+    void on_sortSelection_currentIndexChanged(int index);
+
+
 private:
     Ui::MainWindow *ui;
     YTDLPManager &ytdlpManager;

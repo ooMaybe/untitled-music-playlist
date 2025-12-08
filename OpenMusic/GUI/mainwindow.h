@@ -19,5 +19,10 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    void addSong(const QString &titleName,
+                 const QString &titleArtist,
+                 const QString &titleDuration,
+                 const QString &titleDate,
+                 const QPixmap &icon);
 };
 #endif // MAINWINDOW_H

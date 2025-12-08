@@ -12,6 +12,8 @@ SOURCES += \
     main.cpp \
     GUI/mainwindow.cpp \
     GUI/playlistpage.cpp \
+    GUI/playlistitemwidget.cpp \
+    GUI/playlistlistwidgetyes.cpp \
     Backend/Backend.cpp \
     Backend/FileManager.cpp \
     APIs/YTDLP/YTDLPManager.cpp \
@@ -20,6 +22,8 @@ SOURCES += \
 HEADERS += \
     GUI/mainwindow.h \
     GUI/playlistpage.h \
+    GUI/playlistitemwidget.h \
+    GUI/playlistlistwidgetyes.h \
     Backend/Backend.h \
     Backend/FileManager.h \
     APIs/YTDLP/YTDLPManager.h \
@@ -28,7 +32,9 @@ HEADERS += \
 
 FORMS += \
     GUI/mainwindow.ui \
-    GUI/playlistpage.ui
+    GUI/playlistpage.ui \
+    GUI/playlistitemwidget.ui \
+    GUI/playlistlistwidgetyes.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

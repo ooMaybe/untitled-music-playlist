@@ -2,13 +2,25 @@
 #include <fstream>
 #include <windows.h>
 
+#include "APIs/Json/json.hpp"
 #include "YTDLPManager.h"
 
 using json = nlohmann::json;
 using namespace std;
 
-YTDLPManager::YTDLPManager(){
-    // Constructor implementation can be added here if needed
+YTDLPManager::YTDLPManager()
+    : ytdlpPath("yt-dlp.exe"),      // temporary default
+    searchResultsFile("search_results.json"),
+    outputFolder("Downloads/")
+{}
+
+void YTDLPManager::setPaths(const std::string& ytdlp,
+                            const std::string& searchFile,
+                            const std::string& outputDir)
+{
+    ytdlpPath         = ytdlp;
+    searchResultsFile = searchFile;
+    outputFolder      = outputDir;
 }
 
 vector<SongResult> YTDLPManager::searchSongs(const string& query, int maxResults){

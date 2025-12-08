@@ -12,9 +12,6 @@
 #include <iostream>
 #include <vector>
 
-// Other Libraries
-#include "../Json/json.hpp"  // For JSON parsing
-
 struct SongResult {
     std::string id;           // Video ID
     std::string title;        // Song title
@@ -29,9 +26,14 @@ private:
     std::string ytdlpPath = "..\\APIs\\YTDLP\\yt-dlp.exe";
     std::string searchResultsFile = "data\\search_results.json";
     std::string outputFolder = "data\\Downloads\\";
-    
+
 public:
     YTDLPManager();
+
+    // Updates the paths
+    void setPaths(const std::string& ytdlp,
+                  const std::string& searchFile,
+                  const std::string& outputDir);
     
     // Search for songs on YouTube and return results
     std::vector<SongResult> searchSongs(const std::string& query, int maxResults = 10);

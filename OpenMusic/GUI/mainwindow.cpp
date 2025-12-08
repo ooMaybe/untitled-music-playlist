@@ -278,10 +278,7 @@ void MainWindow::on_sideBarPlaylist_customContextMenuRequested(const QPoint &pos
         QWidget *widget = ui->sideBarPlaylist->itemWidget(item, 0);
         auto *label = qobject_cast<QLabel*>(widget);
 
-        if (!label) return;
-
         QPixmap pixmap = label->pixmap();
-        if (pixmap.isNull()) return;
 
         ui->labelPlaylistImageMain->setPixmap(
             pixmap.scaled(ui->labelPlaylistImageMain->size(),

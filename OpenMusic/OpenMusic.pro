@@ -9,6 +9,7 @@ CONFIG += c++20
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    GUI/sidebarplaylist.cpp \
     main.cpp \
     GUI/mainwindow.cpp \
     GUI/playlistpage.cpp \
@@ -28,13 +29,15 @@ HEADERS += \
     Backend/FileManager.h \
     APIs/YTDLP/YTDLPManager.h \
     APIs/SQLlite/sqlite3.h \
-    APIS/Json/json.hpp
+    APIS/Json/json.hpp \
+    GUI/sidebarplaylist.h
 
 FORMS += \
     GUI/mainwindow.ui \
     GUI/playlistpage.ui \
     GUI/playlistitemwidget.ui \
-    GUI/playlistlistwidgetyes.ui
+    GUI/playlistlistwidgetyes.ui \
+    GUI/sidebarplaylist.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

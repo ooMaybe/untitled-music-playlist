@@ -32,6 +32,7 @@ private slots:
     void on_searchButton_clicked();
 
     void on_searchList_customContextMenuRequested(const QPoint &pos);
+    void on_sideBarPlaylist_customContextMenuRequested(const QPoint &pos);
 
     void on_stopButton_clicked();
 
@@ -39,6 +40,10 @@ private slots:
     void loadThumbnailForTreeItem(const QString &url, QTreeWidgetItem *item);  // ADD THIS
 
     void on_songsDownload_customContextMenuRequested(const QPoint &pos);
+
+    void on_pushButton_clicked();
+
+    void on_homeButton_clicked();
 
 private:
     Ui::MainWindow *ui;

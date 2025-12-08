@@ -2,7 +2,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++20
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -11,14 +11,20 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    playlistitemwidget.cpp \
+    playlistlistwidgetyes.cpp \
     playlistpage.cpp
 
 HEADERS += \
     mainwindow.h \
+    playlistitemwidget.h \
+    playlistlistwidgetyes.h \
     playlistpage.h
 
 FORMS += \
     mainwindow.ui \
+    playlistitemwidget.ui \
+    playlistlistwidgetyes.ui \
     playlistpage.ui
 
 # Default rules for deployment.

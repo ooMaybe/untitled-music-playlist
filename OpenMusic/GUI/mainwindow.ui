@@ -534,6 +534,34 @@
               </rect>
              </property>
             </widget>
+            <widget class="QWidget" name="gridLayoutWidget_3">
+             <property name="geometry">
+              <rect>
+               <x>400</x>
+               <y>10</y>
+               <width>591</width>
+               <height>171</height>
+              </rect>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="0">
+               <widget class="QListWidget" name="searchList"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QPushButton" name="pushButton_5">
+             <property name="geometry">
+              <rect>
+               <x>70</x>
+               <y>90</y>
+               <width>211</width>
+               <height>51</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Search</string>
+             </property>
+            </widget>
            </widget>
           </item>
           <item>
